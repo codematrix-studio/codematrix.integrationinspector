@@ -35,7 +35,8 @@
 | STATUS | VARCHAR(12) | pending / success / error |
 | CORRELATION_ID | VARCHAR(128), NULL | Внешний идентификатор группы |
 | PARENT_EVENT_ID | CHAR(36) ASCII, NULL | Родительское событие без FK |
-| DATE_START | DATETIME | Время начала в UTC |
+| DATE_START | DATETIME | Время начала регистрации в UTC |
+| OCCURRED_AT | DATETIME, NULL | Необязательное время события, переданное вызывающим кодом; не заменяет DATE_START |
 | DATE_FINISH | DATETIME, NULL | Время завершения в UTC |
 | DURATION_MS | BIGINT UNSIGNED, NULL | Длительность в миллисекундах |
 | HTTP_STATUS | SMALLINT UNSIGNED, NULL | HTTP-статус, если применимо |
