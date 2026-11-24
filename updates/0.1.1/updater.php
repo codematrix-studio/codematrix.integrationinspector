@@ -30,13 +30,26 @@ if (!isset($updater) || !is_object($updater) || !method_exists($updater, 'CopyFi
 }
 
 $moduleRelativePath = 'modules/' . $moduleId;
-$modulePath = rtrim((string) $_SERVER['DOCUMENT_ROOT'], '/\\')
-    . '/local/' . $moduleRelativePath;
+$documentRoot = rtrim((string) $_SERVER['DOCUMENT_ROOT'], '/\\');
+$modulePath = $documentRoot . '/local/' . $moduleRelativePath;
+
+// CUpdater::CopyFiles() treats a missing source directory as a successful no-op.
+// Validate the extracted update source first so stale destination files cannot
+// make an incomplete update look successful.
+$updateModulePath = isset($updater->curModulePath) && is_string($updater->curModulePath)
+    ? rtrim($updater->curModulePath, '/\\')
+    : '';
+
+if ($updateModulePath === '' || !is_dir($updateModulePath . '/lib/Storage')) {
+    $errorMessage = 'Не удалось обновить CodeMatrix Integration Inspector: в пакете отсутствуют файлы миграций.';
+    return;
+}
 
 try {
-    // The archive contains the current lib/Storage tree at its root.
     // New module API is unavailable until the update script copies these files.
-    $updater->CopyFiles('lib/Storage', $moduleRelativePath . '/lib/Storage');
+    if (!$updater->CopyFiles('lib/Storage', $moduleRelativePath . '/lib/Storage')) {
+        throw new RuntimeException('Bitrix failed to copy the migration files.');
+    }
 
     $requiredFiles = [
         '/lib/Storage/SchemaInstaller.php',
@@ -56,6 +69,16 @@ try {
         if (!is_file($file)) {
             throw new RuntimeException(
                 'CodeMatrix Integration Inspector update is incomplete: required migration file is missing.'
+            );
+        }
+
+        $sourceFile = $updateModulePath . $relativeFile;
+        if (!is_file($sourceFile) || !hash_equals(
+            (string) hash_file('sha256', $sourceFile),
+            (string) hash_file('sha256', $file)
+        )) {
+            throw new RuntimeException(
+                'CodeMatrix Integration Inspector update did not install the expected migration files.'
             );
         }
 
