@@ -126,10 +126,7 @@ class codematrix_integrationinspector extends CModule
 
         if (is_file($target)) {
             $existing = file_get_contents($target);
-            $isOwned = is_string($existing) && (
-                $existing === $expected
-                || str_contains($existing, 'CodeMatrix Integration Inspector: owned admin entry point.')
-            );
+            $isOwned = is_string($existing) && $this->isOwnedAdminEntryPoint($existing, $expected);
 
             if (!$isOwned) {
                 throw new \RuntimeException(
@@ -155,15 +152,45 @@ class codematrix_integrationinspector extends CModule
 
         $existing = file_get_contents($target);
         $expected = file_get_contents($source);
-        $isOwned = is_string($existing) && (
-            $existing === $expected
-            || str_contains($existing, 'CodeMatrix Integration Inspector: owned admin entry point.')
-        );
+        $isOwned = is_string($existing)
+            && is_string($expected)
+            && $this->isOwnedAdminEntryPoint($existing, $expected);
 
-        // Удаляем только wrapper с маркером владения или legacy-копию исходника.
+        // Удаляем только известные версии wrapper, принадлежащие модулю.
         if ($isOwned) {
             unlink($target);
         }
+    }
+
+    /**
+     * Проверяет принадлежность административного wrapper модулю.
+     *
+     * Поддерживаются текущая версия, legacy-версия до добавления маркера
+     * владения и файлы с маркером текущей версии.
+     */
+    private function isOwnedAdminEntryPoint(string $existing, string $expected): bool
+    {
+        $legacy = <<<'PHP'
+<?php
+
+declare(strict_types=1);
+
+// Точка входа копируется установщиком в /bitrix/admin.
+require $_SERVER['DOCUMENT_ROOT'] . '/local/modules/codematrix.integrationinspector/lib/Admin/EventsPage.php';
+PHP;
+
+        // Учитываем только различия формата перевода строк, не меняя содержимое.
+        $normalize = static fn (string $content): string => str_replace(
+            ["\\r\\n", "\\r"],
+            "\\n",
+            $content
+        );
+
+        $existing = $normalize($existing);
+
+        return $existing === $normalize($expected)
+            || $existing === $normalize($legacy)
+            || str_contains($existing, 'CodeMatrix Integration Inspector: owned admin entry point.');
     }
 
     private function removeThemeAssets(): void
