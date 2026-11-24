@@ -64,6 +64,8 @@ final class EventServiceTest extends TestCase
             $handle->fail(new RuntimeException('Authorization: Bearer hidden-token'))
         );
         self::assertStringNotContainsString('hidden-token', $storage->finalized['result']['error_message']);
+        self::assertArrayNotHasKey('error_file', $storage->finalized['result']);
+        self::assertArrayNotHasKey('error_line', $storage->finalized['result']);
     }
 
     public function testDisabledServiceReturnsNoOpHandleWithoutCallingStorage(): void
