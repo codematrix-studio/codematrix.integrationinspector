@@ -25,6 +25,33 @@ final class MySqlSchemaInspectorTest extends TestCase
         self::assertFalse($inspector->matchesInitialSchema());
     }
 
+    public function testRejectsNonBtreeIndex(): void
+    {
+        $sets = self::schemaResultSets();
+        $sets[2][1]['INDEX_TYPE'] = 'FULLTEXT';
+        $inspector = new MySqlSchemaInspector(new FakeSchemaInspectorConnection($sets));
+
+        self::assertFalse($inspector->matchesInitialSchema());
+    }
+
+    public function testRejectsPrefixIndex(): void
+    {
+        $sets = self::schemaResultSets();
+        $sets[2][1]['SUB_PART'] = 12;
+        $inspector = new MySqlSchemaInspector(new FakeSchemaInspectorConnection($sets));
+
+        self::assertFalse($inspector->matchesInitialSchema());
+    }
+
+    public function testRejectsDescendingIndex(): void
+    {
+        $sets = self::schemaResultSets();
+        $sets[2][1]['COLLATION'] = 'D';
+        $inspector = new MySqlSchemaInspector(new FakeSchemaInspectorConnection($sets));
+
+        self::assertFalse($inspector->matchesInitialSchema());
+    }
+
     public function testRejectsMissingColumn(): void
     {
         $sets = self::schemaResultSets();
@@ -135,6 +162,9 @@ final class MySqlSchemaInspectorTest extends TestCase
                     'NON_UNIQUE' => $unique ? '0' : '1',
                     'SEQ_IN_INDEX' => (string) ($position + 1),
                     'COLUMN_NAME' => $name,
+                    'INDEX_TYPE' => 'BTREE',
+                    'SUB_PART' => null,
+                    'COLLATION' => 'A',
                 ];
             }
         };
