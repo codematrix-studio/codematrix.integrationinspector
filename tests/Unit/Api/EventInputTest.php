@@ -25,7 +25,7 @@ final class EventInputTest extends TestCase
 
     public function testRejectsInvalidSourceCode(): void
     {
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         new EventInput(
             sourceCode: 'Invalid Source',
@@ -36,7 +36,7 @@ final class EventInputTest extends TestCase
 
     public function testRejectsInvalidParentEventId(): void
     {
-        $this->expectException(\\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         new EventInput(
             sourceCode: '1c',
