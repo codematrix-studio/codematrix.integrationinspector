@@ -41,6 +41,7 @@ CodeMatrix Integration Inspector — бесплатный открытый мо�
 - [Модель хранения данных](docs/DATA-MODEL.md)
 - [План тестирования MVP](docs/TEST-PLAN.md)
 - [Среда разработки и тестирования](docs/DEV-ENVIRONMENT.md)
+- [План реализации и структура кода](docs/IMPLEMENTATION-PLAN.md)
 - [Архитектура](docs/ARCHITECTURE.md)
 - [Совместимость](docs/COMPATIBILITY.md)
 - [Дорожная карта](docs/ROADMAP.md)
