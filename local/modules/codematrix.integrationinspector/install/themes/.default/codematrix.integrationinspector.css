@@ -1,0 +1,10 @@
+/* Иконки административного меню CodeMatrix Integration Inspector. */
+#cmi_integrationinspector_menu_icon {
+    background: url("icons/codematrix.integrationinspector/menu.svg") center center no-repeat !important;
+    background-size: 16px 16px !important;
+}
+
+#cmi_integrationinspector_page_icon {
+    background: url("icons/codematrix.integrationinspector/page.svg") center center no-repeat !important;
+    background-size: 32px 32px !important;
+}
