@@ -5,6 +5,11 @@
 ## [Unreleased]
 
 ### Added
+- Начат runtime-каркас модуля: публичные DTO/enum API, интерфейс EventHandle, генератор UUID v4, Sanitizer и регистрация классов через Bitrix Loader.
+- Добавлены Composer/PHPUnit dev-конфигурация и первые unit-тесты для входных данных, UUID и санитарной обработки. Тесты пока не запускались.
+
+
+### Added
 - Добавлен [TRANSACTION-SPIKE.md](docs/TRANSACTION-SPIKE.md) с пошаговым протоколом проверки rollback, именованного соединения, отказов, блокировок, CLI и ORM; на тестовой VM выполнены ограниченные сценарии A/B и проверка отказа соединения C на уровне тестового harness.
 - Создана начальная документация концепции CodeMatrix Integration Inspector.
 - Зафиксированы предварительные границы MVP.
