@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace CodeMatrix\\IntegrationInspector\\Tests\\Storage;
+namespace CodeMatrix\IntegrationInspector\Tests\Storage;
 
-use CodeMatrix\\IntegrationInspector\\Storage\\SchemaInstaller;
-use PHPUnit\\Framework\\TestCase;
+use CodeMatrix\IntegrationInspector\Storage\SchemaInstaller;
+use PHPUnit\Framework\TestCase;
 
 final class SchemaInstallerTest extends TestCase
 {
