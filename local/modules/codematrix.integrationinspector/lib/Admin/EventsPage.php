@@ -16,7 +16,6 @@ $APPLICATION->SetTitle('Журнал интеграций');
 
 if (!$USER->IsAdmin()) {
     $APPLICATION->AuthForm('Доступ к журналу интеграций разрешён только администраторам.');
-}
     return;
 }
 
