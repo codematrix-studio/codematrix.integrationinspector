@@ -179,10 +179,12 @@ declare(strict_types=1);
 require $_SERVER['DOCUMENT_ROOT'] . '/local/modules/codematrix.integrationinspector/lib/Admin/EventsPage.php';
 PHP;
 
+        $legacy .= "\n";
+
         // Учитываем только различия формата перевода строк, не меняя содержимое.
         $normalize = static fn (string $content): string => str_replace(
-            ["\\r\\n", "\\r"],
-            "\\n",
+            ["\r\n", "\r"],
+            "\n",
             $content
         );
 
