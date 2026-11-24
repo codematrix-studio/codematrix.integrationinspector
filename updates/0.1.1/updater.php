@@ -37,10 +37,14 @@ $modulePath = $documentRoot . '/local/' . $moduleRelativePath;
 // Validate the extracted update source first so stale destination files cannot
 // make an incomplete update look successful.
 $updateModulePath = isset($updater->curModulePath) && is_string($updater->curModulePath)
-    ? rtrim($updater->curModulePath, '/\\')
+    ? $documentRoot . '/' . ltrim(rtrim($updater->curModulePath, '/\\'), '/\\')
     : '';
 
-if ($updateModulePath === '' || !is_dir($updateModulePath . '/lib/Storage')) {
+if (
+    $documentRoot === ''
+    || $updateModulePath === ''
+    || !is_dir($updateModulePath . '/lib/Storage')
+) {
     $errorMessage = 'Не удалось обновить CodeMatrix Integration Inspector: в пакете отсутствуют файлы миграций.';
     return;
 }
