@@ -14,9 +14,9 @@ use CodeMatrix\IntegrationInspector\Storage\MySqlEventStorage;
 use Throwable;
 
 /**
- * Public entry point for recording integration events.
+ * Публичная точка входа для регистрации событий интеграций.
  *
- * The module must be installed and included before calling this facade.
+ * Перед вызовом фасада модуль должен быть установлен и подключён.
  */
 final class Inspector
 {
@@ -36,7 +36,7 @@ final class Inspector
      *     requestMetadata?: array,
      *     requestPayload?: ?string,
      *     context?: array,
-     *     occurredAt?: ?\DateTimeImmutable
+     *     occurredAt?: ?\\DateTimeImmutable
      * } $options
      */
     public static function begin(string $sourceCode, string $operation, array $options = []): EventHandle
@@ -56,7 +56,7 @@ final class Inspector
             );
 
             return self::service()->begin($input);
-        } catch (\ValueError | \InvalidArgumentException) {
+        } catch (\\ValueError | \\InvalidArgumentException) {
             return new NullEventHandle(RecordingStatus::INVALID_INPUT);
         } catch (Throwable) {
             return new NullEventHandle(RecordingStatus::STORAGE_UNAVAILABLE);
@@ -64,7 +64,7 @@ final class Inspector
     }
 
     /**
-     * Reset the cached service after changing module options in the admin area.
+     * Сбрасывает кэш сервиса после изменения настроек модуля.
      */
     public static function reset(): void
     {
@@ -82,12 +82,12 @@ final class Inspector
         $errorLocationEnabled = Option::get(self::MODULE_ID, 'error_location_enabled', 'N') === 'Y';
         $connectionName = trim(Option::get(self::MODULE_ID, 'connection_name', ''));
 
-        // An explicitly configured named connection is mandatory. If it cannot
-        // be obtained, begin() returns a no-op handle; never silently fall back
-        // to the application's default connection and join its transaction.
+        // Если явно задано именованное соединение, используем только его.
+        // При ошибке получения соединения не переключаемся на default:
+        // иначе запись Inspector может попасть в транзакцию приложения.
         $connection = $connectionName === ''
             ? Application::getConnection()
-            : Application::getConnectionPool()->getConnection($connectionName);
+            : Application::getInstance()->getConnectionPool()->getConnection($connectionName);
 
         self::$service = new EventService(
             new MySqlEventStorage($connection),
