@@ -300,14 +300,18 @@ PHP;
             }
         }
 
-        $iconDirectory = $targetDirectory . '/icons/codematrix.integrationinspector';
-        if (is_dir($iconDirectory)) {
-            rmdir($iconDirectory);
-        }
+        // При откате не удаляем каталоги: они могли существовать до установки.
+        // При обычном удалении убираем только пустые каталоги ресурсов модуля.
+        if (!$onlyCreatedDuringInstall) {
+            $iconDirectory = $targetDirectory . '/icons/codematrix.integrationinspector';
+            if (is_dir($iconDirectory)) {
+                rmdir($iconDirectory);
+            }
 
-        $iconsDirectory = $targetDirectory . '/icons';
-        if (is_dir($iconsDirectory) && count(scandir($iconsDirectory)) === 2) {
-            rmdir($iconsDirectory);
+            $iconsDirectory = $targetDirectory . '/icons';
+            if (is_dir($iconsDirectory) && count(scandir($iconsDirectory)) === 2) {
+                rmdir($iconsDirectory);
+            }
         }
     }
 }
