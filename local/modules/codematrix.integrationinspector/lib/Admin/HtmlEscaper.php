@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CodeMatrix\\IntegrationInspector\\Admin;
+namespace CodeMatrix\IntegrationInspector\Admin;
 
 /**
  * Экранирование значений журнала перед выводом в HTML.
