@@ -28,7 +28,7 @@ if (!Loader::includeModule($moduleId)) {
 
 function cmiIntegrationInspectorHtml($value): string
 {
-    return \\CodeMatrix\\IntegrationInspector\\Admin\\HtmlEscaper::escape($value);
+    return \CodeMatrix\IntegrationInspector\Admin\HtmlEscaper::escape($value);
 }
 
 function cmiIntegrationInspectorGetString(string $name): string
