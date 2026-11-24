@@ -23,7 +23,8 @@ final class StoredEventHandle implements EventHandle
         private readonly int $startedAtNanoseconds,
         private readonly EventStorage $storage,
         private readonly Sanitizer $sanitizer,
-        private readonly bool $payloadsEnabled
+        private readonly bool $payloadsEnabled,
+        private readonly bool $errorLocationEnabled = false
     ) {
     }
 
@@ -63,13 +64,18 @@ final class StoredEventHandle implements EventHandle
     public function fail(Throwable $exception): FinalizeResult
     {
         try {
-            return $this->finalize('error', [
+            $error = [
                 'exception_class' => get_class($exception),
                 'exception_code' => (string) $exception->getCode(),
                 'error_message' => $this->sanitizer->sanitizeErrorMessage($exception->getMessage()),
-                'error_file' => basename($exception->getFile()),
-                'error_line' => $exception->getLine(),
-            ]);
+            ];
+
+            if ($this->errorLocationEnabled) {
+                $error['error_file'] = basename($exception->getFile());
+                $error['error_line'] = $exception->getLine();
+            }
+
+            return $this->finalize('error', $error);
         } catch (Throwable) {
             return FinalizeResult::STORAGE_UNAVAILABLE;
         }
