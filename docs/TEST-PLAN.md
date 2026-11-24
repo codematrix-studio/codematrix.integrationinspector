@@ -135,6 +135,8 @@
 | MIG-UNIT-013 | Отсутствует обязательная колонка или индекс | Схема не принимается как baseline |
 | MIG-UNIT-014 | InitialSchemaMigration видит частично существующие таблицы | Не выполняет DDL; версия не повышается |
 | MIG-UNIT-015 | InitialSchemaMigration видит чистую БД | Создаёт три таблицы, затем требует успешной проверки структуры |
+| MIG-UNIT-016 | Runner принимает существующую полную схему 0.1.0 как baseline | Записывает версию 1 без DDL |
+| MIG-UNIT-017 | Runner получает частичную существующую схему | Не выполняет DDL и не записывает версию схемы |
 
 **Статус:** unit-тесты MigrationRunner, MySqlSchemaVersionStore, MySqlMigrationLock, InitialSchemaMigration и MySqlSchemaInspector добавлены; CI прошёл на PHP 8.2, 8.3 и 8.4. Проверка INFORMATION_SCHEMA тестируется на fake connection; реальная BitrixVM/MySQL-проверка и Bitrix updater lifecycle не выполнены.
 
