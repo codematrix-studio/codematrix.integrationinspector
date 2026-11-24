@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Bitrix\\Main\\Application;
-use CodeMatrix\\IntegrationInspector\\Storage\\SchemaInstaller;
-use CodeMatrix\\IntegrationInspector\\Storage\\Migrations\\InitialSchemaMigration;
-use CodeMatrix\\IntegrationInspector\\Storage\\Migrations\\MigrationRunner;
-use CodeMatrix\\IntegrationInspector\\Storage\\Migrations\\MySqlMigrationLock;
-use CodeMatrix\\IntegrationInspector\\Storage\\Migrations\\MySqlSchemaInspector;
-use CodeMatrix\\IntegrationInspector\\Storage\\Migrations\\MySqlSchemaVersionStore;
+use Bitrix\Main\Application;
+use CodeMatrix\IntegrationInspector\Storage\SchemaInstaller;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\InitialSchemaMigration;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MigrationRunner;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MySqlMigrationLock;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MySqlSchemaInspector;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MySqlSchemaVersionStore;
 
 /**
  * CodeMatrix Integration Inspector 0.1.1 update.
@@ -22,7 +22,7 @@ if (!isset($updater) || !is_object($updater) || !method_exists($updater, 'CopyFi
 
 $moduleId = 'codematrix.integrationinspector';
 $moduleRelativePath = 'modules/' . $moduleId;
-$modulePath = rtrim((string) $_SERVER['DOCUMENT_ROOT'], '/\\\\')
+$modulePath = rtrim((string) $_SERVER['DOCUMENT_ROOT'], '/\\')
     . '/local/' . $moduleRelativePath;
 
 // The update archive contains the current lib/Storage tree at its root.
