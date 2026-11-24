@@ -102,7 +102,8 @@ class codematrix_integrationinspector extends CModule
 
         // При обычном удалении модуля история диагностики сохраняется.
         return true;
-    }    
+    }
+
     private function installAdminEntryPoint(): void
     {
         $source = dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php';
@@ -113,7 +114,7 @@ class codematrix_integrationinspector extends CModule
             $expected = file_get_contents($source);
 
             if ($existing !== $expected) {
-                throw new \\RuntimeException(
+                throw new \RuntimeException(
                     'Файл /bitrix/admin/cmi_integrationinspector_events.php уже существует и не принадлежит модулю.'
                 );
             }
@@ -122,7 +123,7 @@ class codematrix_integrationinspector extends CModule
         }
 
         if (!copy($source, $target)) {
-            throw new \\RuntimeException('Не удалось установить административную страницу модуля.');
+            throw new \RuntimeException('Не удалось установить административную страницу модуля.');
         }
     }
 
@@ -143,5 +144,4 @@ class codematrix_integrationinspector extends CModule
             unlink($target);
         }
     }
-
 }
