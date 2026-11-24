@@ -95,7 +95,7 @@ $tabControl = new CAdminTabControl('cmiIntegrationInspectorSettings', [
         <td width="40%">Ведение журнала</td>
         <td>
             <input type="checkbox" name="enabled" value="Y"<?= $settings['enabled'] === 'Y' ? ' checked' : '' ?>>
-            <span class=" ಕ">Записывать новые события</span>
+            <span>Записывать новые события</span>
         </td>
     </tr>
     <tr>
