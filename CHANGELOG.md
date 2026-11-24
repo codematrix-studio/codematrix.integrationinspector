@@ -19,6 +19,7 @@
 - Добавлены TRANSACTION-STRATEGY.md и INSTALLATION.md: описаны режимы соединения, ограничения при rollback, опциональная независимая запись, безопасное обновление и сохранение данных при обычном удалении.
 - В DECISIONS.md добавлено D-013; в TEST-PLAN.md добавлены проверки default/named connection и rollback. Независимая запись пока не проверена экспериментально.
 - API-REVIEW.md синхронизирован с API v0.2: уточнён формат parentEventId и добавлены ссылки на транзакционную стратегию и установщик.
+- Добавлен DEV-ENVIRONMENT.md: зафиксирована изоляция dev-зависимостей, PHPUnit 11.5 для PHP 8.2 и разделение unit/integration/security/compatibility тестов. Composer-конфигурация ещё не добавлена.
 
 ### Changed
 - Уточнена спецификация MVP с учётом контракта API.
