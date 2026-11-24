@@ -64,7 +64,10 @@ class codematrix_integrationinspector extends CModule
 
     public function DoUninstall()
     {
-        DeleteFile($_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php');
+        $adminPage = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php';
+        if (is_file($adminPage)) {
+            unlink($adminPage);
+        }
         UnRegisterModule($this->MODULE_ID);
 
         // При обычном удалении модуля история диагностики сохраняется.
