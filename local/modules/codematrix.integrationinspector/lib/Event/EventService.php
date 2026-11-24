@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CodeMatrix\IntegrationInspector\Event;
 
 use CodeMatrix\IntegrationInspector\Api\EventInput;
+use CodeMatrix\IntegrationInspector\Api\EventHandle;
 use CodeMatrix\IntegrationInspector\Api\RecordingStatus;
 use CodeMatrix\IntegrationInspector\Event\Handle\NullEventHandle;
 use CodeMatrix\IntegrationInspector\Event\Handle\StoredEventHandle;
@@ -26,7 +27,7 @@ final readonly class EventService
     ) {
     }
 
-    public function begin(EventInput $input): StoredEventHandle|NullEventHandle
+    public function begin(EventInput $input): EventHandle
     {
         if (!$this->enabled) {
             return new NullEventHandle(RecordingStatus::DISABLED);
