@@ -15,6 +15,9 @@ Loader::registerAutoLoadClasses(
         CodeMatrix\IntegrationInspector\Api\EventOutcome::class => 'lib/Api/EventOutcome.php',
         CodeMatrix\IntegrationInspector\Api\SourceDefinition::class => 'lib/Api/SourceDefinition.php',
         CodeMatrix\IntegrationInspector\Event\EventIdGenerator::class => 'lib/Event/EventIdGenerator.php',
+        CodeMatrix\IntegrationInspector\Event\EventService::class => 'lib/Event/EventService.php',
+        CodeMatrix\IntegrationInspector\Event\Handle\StoredEventHandle::class => 'lib/Event/Handle/StoredEventHandle.php',
+        CodeMatrix\IntegrationInspector\Storage\EventStorage::class => 'lib/Storage/EventStorage.php',
         CodeMatrix\IntegrationInspector\Sanitizer\Sanitizer::class => 'lib/Sanitizer/Sanitizer.php',
     ]
 );
