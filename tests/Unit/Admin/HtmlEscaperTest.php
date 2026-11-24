@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace CodeMatrix\\IntegrationInspector\\Tests\\Unit\\Admin;
+namespace CodeMatrix\IntegrationInspector\Tests\Unit\Admin;
 
-use CodeMatrix\\IntegrationInspector\\Admin\\HtmlEscaper;
-use PHPUnit\\Framework\\TestCase;
+use CodeMatrix\IntegrationInspector\Admin\HtmlEscaper;
+use PHPUnit\Framework\TestCase;
 
 final class HtmlEscaperTest extends TestCase
 {
