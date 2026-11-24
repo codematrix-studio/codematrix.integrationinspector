@@ -131,8 +131,12 @@
 | MIG-UNIT-009 | Невалидная/дробная/отрицательная версия | Значение отклоняется |
 | MIG-UNIT-010 | MySQL advisory lock получен и освобождён | GET_LOCK/RELEASE_LOCK вызываются на одном соединении |
 | MIG-UNIT-011 | Advisory lock занят другим процессом | Runner не создаёт таблицу версии и не выполняет миграции |
+| MIG-UNIT-012 | MySqlSchemaInspector получает точную начальную структуру | Схема 0.1.0 распознаётся как baseline |
+| MIG-UNIT-013 | Отсутствует обязательная колонка или индекс | Схема не принимается как baseline |
+| MIG-UNIT-014 | InitialSchemaMigration видит частично существующие таблицы | Не выполняет DDL; версия не повышается |
+| MIG-UNIT-015 | InitialSchemaMigration видит чистую БД | Создаёт три таблицы, затем требует успешной проверки структуры |
 
-**Статус:** тесты MigrationRunner, MySqlSchemaVersionStore и MySqlMigrationLock добавлены; CI прошёл на PHP 8.2, 8.3 и 8.4. Эти тесты используют fake connection и не проверяют реальный MySQL DDL, baseline или Bitrix updater lifecycle.
+**Статус:** unit-тесты MigrationRunner, MySqlSchemaVersionStore, MySqlMigrationLock, InitialSchemaMigration и MySqlSchemaInspector добавлены; CI прошёл на PHP 8.2, 8.3 и 8.4. Проверка INFORMATION_SCHEMA тестируется на fake connection; реальная BitrixVM/MySQL-проверка и Bitrix updater lifecycle не выполнены.
 
 ## 8. Очистка и жизненный цикл модуля
 
