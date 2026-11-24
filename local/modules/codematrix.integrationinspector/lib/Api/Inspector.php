@@ -6,6 +6,7 @@ namespace CodeMatrix\IntegrationInspector\Api;
 
 use Bitrix\Main\Application;
 use Bitrix\Main\Config\Option;
+use CodeMatrix\IntegrationInspector\Diagnostic\DiagnosticLogger;
 use CodeMatrix\IntegrationInspector\Event\EventIdGenerator;
 use CodeMatrix\IntegrationInspector\Event\EventService;
 use CodeMatrix\IntegrationInspector\Event\Handle\NullEventHandle;
@@ -58,7 +59,9 @@ final class Inspector
             return self::service()->begin($input);
         } catch (\ValueError | \InvalidArgumentException) {
             return new NullEventHandle(RecordingStatus::INVALID_INPUT);
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            DiagnosticLogger::log('inspector.begin', $exception, new Sanitizer());
+
             return new NullEventHandle(RecordingStatus::STORAGE_UNAVAILABLE);
         }
     }

@@ -7,6 +7,7 @@ namespace CodeMatrix\IntegrationInspector\Event;
 use CodeMatrix\IntegrationInspector\Api\EventInput;
 use CodeMatrix\IntegrationInspector\Api\EventHandle;
 use CodeMatrix\IntegrationInspector\Api\RecordingStatus;
+use CodeMatrix\IntegrationInspector\Diagnostic\DiagnosticLogger;
 use CodeMatrix\IntegrationInspector\Event\Handle\NullEventHandle;
 use CodeMatrix\IntegrationInspector\Event\Handle\StoredEventHandle;
 use CodeMatrix\IntegrationInspector\Sanitizer\Sanitizer;
@@ -74,7 +75,9 @@ final readonly class EventService
                 $this->payloadsEnabled,
                 $this->errorLocationEnabled
             );
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            DiagnosticLogger::log('event.begin', $exception, $this->sanitizer);
+
             return new NullEventHandle(RecordingStatus::STORAGE_UNAVAILABLE);
         }
     }
