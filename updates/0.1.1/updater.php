@@ -30,24 +30,45 @@ if (!isset($updater) || !is_object($updater) || !method_exists($updater, 'CopyDi
 }
 
 $moduleRelativePath = 'modules/' . $moduleId;
-$documentRoot = rtrim((string) $_SERVER['DOCUMENT_ROOT'], '/\\');
+$documentRoot = isset($_SERVER['DOCUMENT_ROOT'])
+    ? rtrim((string) $_SERVER['DOCUMENT_ROOT'], '/\\')
+    : '';
 $modulePath = $documentRoot . '/local/' . $moduleRelativePath;
 
 // CUpdater::CopyDirFiles() treats a missing source directory as a successful no-op.
-// Validate the extracted update source first so stale destination files cannot
-// make an incomplete update look successful.
+// Validate every required source file before copying so an incomplete package
+// cannot leave a partially updated module.
 $updateModuleRelativePath = isset($updater->curModulePath) && is_string($updater->curModulePath)
     ? '/' . ltrim(rtrim($updater->curModulePath, '/\\'), '/\\')
     : '';
 $updateModulePath = $documentRoot . $updateModuleRelativePath;
+$requiredFiles = [
+    '/lib/Storage/SchemaInstaller.php',
+    '/lib/Storage/Migrations/SchemaMigration.php',
+    '/lib/Storage/Migrations/SchemaVersionStore.php',
+    '/lib/Storage/Migrations/MigrationLock.php',
+    '/lib/Storage/Migrations/InitialSchemaVerifier.php',
+    '/lib/Storage/Migrations/MySqlSchemaVersionStore.php',
+    '/lib/Storage/Migrations/MySqlMigrationLock.php',
+    '/lib/Storage/Migrations/MySqlSchemaInspector.php',
+    '/lib/Storage/Migrations/InitialSchemaMigration.php',
+    '/lib/Storage/Migrations/MigrationRunner.php',
+];
 
 if (
     $documentRoot === ''
-    || $updateModulePath === ''
+    || $updateModuleRelativePath === ''
     || !is_dir($updateModulePath . '/lib/Storage')
 ) {
     $errorMessage = 'Не удалось обновить CodeMatrix Integration Inspector: в пакете отсутствуют файлы миграций.';
     return;
+}
+
+foreach ($requiredFiles as $relativeFile) {
+    if (!is_file($updateModulePath . $relativeFile) || !is_readable($updateModulePath . $relativeFile)) {
+        $errorMessage = 'Не удалось обновить CodeMatrix Integration Inspector: пакет обновления неполон или повреждён.';
+        return;
+    }
 }
 
 try {
@@ -60,19 +81,6 @@ try {
     )) {
         throw new RuntimeException('Bitrix failed to copy the migration files.');
     }
-
-    $requiredFiles = [
-        '/lib/Storage/SchemaInstaller.php',
-        '/lib/Storage/Migrations/SchemaMigration.php',
-        '/lib/Storage/Migrations/SchemaVersionStore.php',
-        '/lib/Storage/Migrations/MigrationLock.php',
-        '/lib/Storage/Migrations/InitialSchemaVerifier.php',
-        '/lib/Storage/Migrations/MySqlSchemaVersionStore.php',
-        '/lib/Storage/Migrations/MySqlMigrationLock.php',
-        '/lib/Storage/Migrations/MySqlSchemaInspector.php',
-        '/lib/Storage/Migrations/InitialSchemaMigration.php',
-        '/lib/Storage/Migrations/MigrationRunner.php',
-    ];
 
     foreach ($requiredFiles as $relativeFile) {
         $file = $modulePath . $relativeFile;
