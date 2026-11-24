@@ -73,10 +73,14 @@ try {
         }
 
         $sourceFile = $updateModulePath . $relativeFile;
-        if (!is_file($sourceFile) || !hash_equals(
-            (string) hash_file('sha256', $sourceFile),
-            (string) hash_file('sha256', $file)
-        )) {
+        $sourceHash = is_file($sourceFile) ? hash_file('sha256', $sourceFile) : false;
+        $installedHash = hash_file('sha256', $file);
+
+        if (
+            !is_string($sourceHash)
+            || !is_string($installedHash)
+            || !hash_equals($sourceHash, $installedHash)
+        ) {
             throw new RuntimeException(
                 'CodeMatrix Integration Inspector update did not install the expected migration files.'
             );
