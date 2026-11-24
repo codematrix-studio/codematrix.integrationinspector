@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace CodeMatrix\\IntegrationInspector\\Storage;
+namespace CodeMatrix\IntegrationInspector\Storage;
 
-use Bitrix\\Main\\Application;
-use Bitrix\\Main\\Config\\Option;
+use Bitrix\Main\Application;
+use Bitrix\Main\Config\Option;
 use DateTimeImmutable;
 use DateTimeZone;
 use Throwable;
@@ -29,13 +29,10 @@ final class EventCleanup
             $connection = Application::getConnection();
             $helper = $connection->getSqlHelper();
             $lockName = $helper->forSql(self::LOCK_NAME);
-
-            $lock = $connection->query(
-                "SELECT GET_LOCK('{$lockName}', 0) AS LOCKED"
-            )->fetch();
+            $lock = $connection->query("SELECT GET_LOCK('{$lockName}', 0) AS LOCKED")->fetch();
 
             if ((int) ($lock['LOCKED'] ?? 0) !== 1) {
-                return '\\\\CodeMatrix\\\\IntegrationInspector\\\\Storage\\\\EventCleanup::run();';
+                return '\\CodeMatrix\\IntegrationInspector\\Storage\\EventCleanup::run();';
             }
 
             try {
@@ -75,6 +72,6 @@ final class EventCleanup
             );
         }
 
-        return '\\\\CodeMatrix\\\\IntegrationInspector\\\\Storage\\\\EventCleanup::run();';
+        return '\\CodeMatrix\\IntegrationInspector\\Storage\\EventCleanup::run();';
     }
 }
