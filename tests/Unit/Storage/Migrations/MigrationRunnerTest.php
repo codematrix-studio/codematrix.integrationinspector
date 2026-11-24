@@ -39,6 +39,25 @@ final class MigrationRunnerTest extends TestCase
         self::assertSame(1, $second->runs);
     }
 
+    public function testRecordedVersionIsRejectedWhenPhysicalSchemaNoLongerMatches(): void
+    {
+        $store = new InMemorySchemaVersionStore(1);
+        $first = new FakeSchemaMigration(1, verified: false);
+        $second = new FakeSchemaMigration(2);
+        $runner = new MigrationRunner($store, [$first, $second], new FakeMigrationLock());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('does not match its recorded version 1');
+
+        try {
+            $runner->run();
+        } finally {
+            self::assertSame(1, $store->version);
+            self::assertSame([], $store->writtenVersions);
+            self::assertSame(0, $second->runs);
+        }
+    }
+
     public function testFailedMigrationDoesNotAdvanceVersion(): void
     {
         $store = new InMemorySchemaVersionStore();
