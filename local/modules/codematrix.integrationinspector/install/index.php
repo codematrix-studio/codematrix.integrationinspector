@@ -43,10 +43,8 @@ class codematrix_integrationinspector extends CModule
             // как Bitrix получил корректный путь к модулю.
             require_once dirname(__DIR__) . '/include.php';
 
-            // Копируем только адресный файл входа в административную часть Bitrix.
-            if (!copy(dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php')) {
-                throw new \RuntimeException('Не удалось установить административную страницу модуля.');
-            }
+            // Не перезаписываем чужую административную страницу с тем же именем.
+            $this->installAdminEntryPoint();
 
             // Устанавливаем только собственные стили и изображения административного меню.
             if (!CopyDirFiles(
@@ -74,10 +72,7 @@ class codematrix_integrationinspector extends CModule
 
     public function DoUninstall()
     {
-        $adminPage = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php';
-        if (is_file($adminPage)) {
-            unlink($adminPage);
-        }
+        $this->removeAdminEntryPoint();
 
         // Удаляем только файлы иконок этого модуля, не затрагивая общие темы Bitrix.
         $themeDirectory = $_SERVER['DOCUMENT_ROOT'] . '/local/themes/.default';
@@ -107,5 +102,46 @@ class codematrix_integrationinspector extends CModule
 
         // При обычном удалении модуля история диагностики сохраняется.
         return true;
+    }    
+    private function installAdminEntryPoint(): void
+    {
+        $source = dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php';
+        $target = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php';
+
+        if (is_file($target)) {
+            $existing = file_get_contents($target);
+            $expected = file_get_contents($source);
+
+            if ($existing !== $expected) {
+                throw new \\RuntimeException(
+                    'Файл /bitrix/admin/cmi_integrationinspector_events.php уже существует и не принадлежит модулю.'
+                );
+            }
+
+            return;
+        }
+
+        if (!copy($source, $target)) {
+            throw new \\RuntimeException('Не удалось установить административную страницу модуля.');
+        }
     }
+
+    private function removeAdminEntryPoint(): void
+    {
+        $source = dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php';
+        $target = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php';
+
+        if (!is_file($target) || !is_file($source)) {
+            return;
+        }
+
+        $existing = file_get_contents($target);
+        $expected = file_get_contents($source);
+
+        // Удаляем только точную копию собственного файла модуля.
+        if ($existing === $expected) {
+            unlink($target);
+        }
+    }
+
 }
