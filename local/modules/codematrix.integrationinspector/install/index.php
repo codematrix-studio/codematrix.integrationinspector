@@ -45,7 +45,7 @@ class codematrix_integrationinspector extends CModule
 
             // Копируем только адресный файл входа в административную часть Bitrix.
             if (!CopyDirFiles(dirname(__DIR__) . '/admin', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin', true, false)) {
-                throw new \\RuntimeException('Не удалось установить административную страницу модуля.');
+                throw new \RuntimeException('Не удалось установить административную страницу модуля.');
             }
 
             return true;
