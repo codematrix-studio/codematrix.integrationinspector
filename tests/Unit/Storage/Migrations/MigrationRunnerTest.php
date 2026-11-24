@@ -77,6 +77,25 @@ final class MigrationRunnerTest extends TestCase
         self::assertTrue($lock->released);
     }
 
+    public function testLockIsReleasedWhenVersionStorageInitializationFails(): void
+    {
+        $store = new InMemorySchemaVersionStore();
+        $store->failEnsureStorage = true;
+        $lock = new FakeMigrationLock();
+        $runner = new MigrationRunner($store, [new FakeSchemaMigration(1)], $lock);
+
+        try {
+            $runner->run();
+            self::fail('Expected version storage initialization failure.');
+        } catch (RuntimeException $exception) {
+            self::assertSame('Version storage initialization failed.', $exception->getMessage());
+        }
+
+        self::assertTrue($lock->released);
+        self::assertSame(0, $store->version);
+        self::assertSame([], $store->writtenVersions);
+    }
+
     public function testMigrationMustPassPhysicalSchemaVerificationBeforeVersionIsSaved(): void
     {
         $store = new InMemorySchemaVersionStore();
@@ -146,6 +165,7 @@ final class InMemorySchemaVersionStore implements SchemaVersionStore
     public int $version;
     public array $writtenVersions = [];
     public bool $storageEnsured = false;
+    public bool $failEnsureStorage = false;
 
     public function __construct(int $version = 0)
     {
@@ -155,6 +175,10 @@ final class InMemorySchemaVersionStore implements SchemaVersionStore
     public function ensureStorage(): void
     {
         $this->storageEnsured = true;
+
+        if ($this->failEnsureStorage) {
+            throw new RuntimeException('Version storage initialization failed.');
+        }
     }
 
     public function getVersion(): int
