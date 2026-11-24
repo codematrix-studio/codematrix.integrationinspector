@@ -5,6 +5,12 @@
 ## [Unreleased]
 
 ### Added
+- Добавлена безопасная диагностика причин `STORAGE_UNAVAILABLE`: класс исключения и очищенное сообщение записываются в системный PHP error log; диагностический сбой не влияет на основную интеграцию. Добавлены unit-тесты форматирования и маскирования.
+
+### Verified
+- На BitrixVM проверена реальная независимая запись Inspector: событие через `inspector_storage` сохранилось со статусом `success` после rollback бизнес-транзакции на default connection. Оба соединения указывают на БД `sitemanager`, но являются отдельными соединениями. Окружение: CentOS Stream 9, PHP 8.2.30, MySQL 8.0.44; версия ядра Bitrix не зафиксирована.
+
+### Added
 - Добавлен опциональный выбор соединения хранилища через настройку модуля `connection_name`: пустое значение использует default connection, заданное имя разрешается через Bitrix ConnectionPool; при отказе именованного соединения нет скрытого fallback.
 - Добавлены MySqlEventStorage на Bitrix D7 Connection и повторно запускаемый SchemaInstaller для b_cmi_event, b_cmi_event_data и b_cmi_source; транзакции вызывающего приложения не открываются и не завершаются.
 - Добавлены `install/index.php` и `install/version.php`: первичная установка создаёт таблицы на default connection и регистрирует модуль после успешного DDL; обычное удаление снимает регистрацию, сохраняя историю. публичные DTO/enum API, фасад Inspector::begin(), EventHandle, no-op и рабочий handle, EventService, контракт EventStorage, генератор UUID v4, Sanitizer и регистрация классов через Bitrix Loader.
