@@ -86,38 +86,45 @@ final class EventRepository
     {
         $conditions = [];
 
-        $sourceCode = trim((string) ($filters['source_code'] ?? ''));
+        $sourceCode = trim($this->filterString($filters, 'source_code'));
         if ($sourceCode !== '') {
             $conditions[] = 'SOURCE_CODE = ' . $this->quote(mb_substr($sourceCode, 0, 64));
         }
 
-        $status = (string) ($filters['status'] ?? '');
+        $status = $this->filterString($filters, 'status');
         if (in_array($status, ['pending', 'success', 'error'], true)) {
             $conditions[] = 'STATUS = ' . $this->quote($status);
         }
 
-        $direction = (string) ($filters['direction'] ?? '');
+        $direction = $this->filterString($filters, 'direction');
         if (in_array($direction, ['incoming', 'outgoing'], true)) {
             $conditions[] = 'DIRECTION = ' . $this->quote($direction);
         }
 
-        $correlationId = trim((string) ($filters['correlation_id'] ?? ''));
+        $correlationId = trim($this->filterString($filters, 'correlation_id'));
         if ($correlationId !== '') {
             $conditions[] = 'CORRELATION_ID = ' . $this->quote(mb_substr($correlationId, 0, 128));
         }
 
-        $dateFrom = $this->validDate((string) ($filters['date_from'] ?? ''));
+        $dateFrom = $this->validDate($this->filterString($filters, 'date_from'));
         if ($dateFrom !== null) {
             $conditions[] = 'DATE_START >= ' . $this->quote($dateFrom . ' 00:00:00');
         }
 
-        $dateTo = $this->validDate((string) ($filters['date_to'] ?? ''));
+        $dateTo = $this->validDate($this->filterString($filters, 'date_to'));
         if ($dateTo !== null) {
             $nextDay = (new DateTimeImmutable($dateTo))->modify('+1 day')->format('Y-m-d');
             $conditions[] = 'DATE_START < ' . $this->quote($nextDay . ' 00:00:00');
         }
 
         return $conditions === [] ? '' : ' WHERE ' . implode(' AND ', $conditions);
+    }
+
+    private function filterString(array $filters, string $key): string
+    {
+        $value = $filters[$key] ?? '';
+
+        return is_string($value) ? $value : '';
     }
 
     private function validDate(string $value): ?string
