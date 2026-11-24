@@ -225,7 +225,7 @@ HTTP — необязательный контекст, а не зависимо
 Правила по умолчанию:
 
 - тела не сохраняются;
-- Authorization, Proxy-Authorization, Cookie, Set-Cookie и ключи, похожие на password/token/secret/api_key, маскируются;
+- Authorization, Proxy-Authorization, Cookie, Set-Cookie, password/passwd, token/secret, api_key/access_key/client_secret, private_key/signing_key/encryption_key, credentials и session_id маскируются по имени поля;
 - перед обработкой и после sanitization действуют ограничения размера;
 - неподдерживаемые типы отбрасываются;
 - Sanitizer работает до записи; UI не заменяет санитаризацию на входе.
