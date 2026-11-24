@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace CodeMatrix\IntegrationInspector\Storage;
 
-use CodeMatrix\\IntegrationInspector\\Api\\FinalizeResult;
+use CodeMatrix\IntegrationInspector\Api\FinalizeResult;
 use DateTimeImmutable;
 
 interface EventStorage
