@@ -7,6 +7,8 @@ use Bitrix\Main\Loader;
 Loader::registerAutoLoadClasses(
     'codematrix.integrationinspector',
     [
+        CodeMatrix\IntegrationInspector\Api\Inspector::class => 'lib/Api/Inspector.php',
+        CodeMatrix\IntegrationInspector\Event\Handle\NullEventHandle::class => 'lib/Event/Handle/NullEventHandle.php',
         CodeMatrix\IntegrationInspector\Api\EventDirection::class => 'lib/Api/EventDirection.php',
         CodeMatrix\IntegrationInspector\Api\RecordingStatus::class => 'lib/Api/RecordingStatus.php',
         CodeMatrix\IntegrationInspector\Api\FinalizeResult::class => 'lib/Api/FinalizeResult.php',
