@@ -70,6 +70,17 @@ final class MigrationRunner
                 );
             }
 
+            // Записанная версия не заменяет проверку физической схемы:
+            // таблицы могли быть удалены или изменены после предыдущего запуска.
+            if ($currentVersion > 0 && !$this->migrations[$currentVersion - 1]->isApplied()) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Database schema does not match its recorded version %d.',
+                        $currentVersion
+                    )
+                );
+            }
+
             foreach ($this->migrations as $migration) {
                 if ($migration->version() <= $currentVersion) {
                     continue;
