@@ -56,7 +56,7 @@ final class Inspector
             );
 
             return self::service()->begin($input);
-        } catch (\InvalidArgumentException) {
+        } catch (\ValueError | \InvalidArgumentException) {
             return new NullEventHandle(RecordingStatus::INVALID_INPUT);
         } catch (Throwable) {
             return new NullEventHandle(RecordingStatus::STORAGE_UNAVAILABLE);
