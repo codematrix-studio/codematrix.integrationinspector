@@ -127,8 +127,12 @@
 | MIG-UNIT-005 | Текущая версия ниже поддерживаемой | Выполняются только следующие миграции |
 | MIG-UNIT-006 | Версия БД выше максимальной версии runner | Runner останавливается |
 | MIG-UNIT-007 | Миграция уже учтена в версии | Повторно не запускается |
+| MIG-UNIT-008 | MySQL version store создаёт служебную таблицу и читает/записывает версию | SQL содержит ожидаемую схему и идемпотентный upsert |
+| MIG-UNIT-009 | Невалидная/дробная/отрицательная версия | Значение отклоняется |
+| MIG-UNIT-010 | MySQL advisory lock получен и освобождён | GET_LOCK/RELEASE_LOCK вызываются на одном соединении |
+| MIG-UNIT-011 | Advisory lock занят другим процессом | Runner не создаёт таблицу версии и не выполняет миграции |
 
-**Статус:** тесты каркаса MigrationRunner добавлены; CI для новых тестов выполняется. Эти тесты не проверяют MySQL DDL, baseline, блокировку или Bitrix updater lifecycle.
+**Статус:** тесты MigrationRunner, MySqlSchemaVersionStore и MySqlMigrationLock добавлены; CI прошёл на PHP 8.2, 8.3 и 8.4. Эти тесты используют fake connection и не проверяют реальный MySQL DDL, baseline или Bitrix updater lifecycle.
 
 ## 8. Очистка и жизненный цикл модуля
 
