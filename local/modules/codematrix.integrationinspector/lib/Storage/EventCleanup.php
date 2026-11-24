@@ -48,20 +48,33 @@ final class EventCleanup
                 $quotedCutoff = "'" . $helper->forSql($cutoff) . "'";
 
                 do {
-                    $connection->queryExecute(
-                        "DELETE e, d
-                         FROM b_cmi_event e
-                         LEFT JOIN b_cmi_event_data d ON d.EVENT_ID = e.EVENT_ID
-                         INNER JOIN (
-                            SELECT EVENT_ID
-                            FROM b_cmi_event
-                            WHERE DATE_START < {$quotedCutoff}
-                            ORDER BY DATE_START, EVENT_ID
-                            LIMIT " . self::BATCH_SIZE . "
-                         ) expired ON expired.EVENT_ID = e.EVENT_ID"
+                    $result = $connection->query(
+                        "SELECT EVENT_ID
+                         FROM b_cmi_event
+                         WHERE DATE_START < {$quotedCutoff}
+                         ORDER BY DATE_START, EVENT_ID
+                         LIMIT " . self::BATCH_SIZE
                     );
-                    $deleted = (int) $connection->getAffectedRowsCount();
-                } while ($deleted > 0);
+                    $eventIds = [];
+                    while ($row = $result->fetch()) {
+                        if (is_array($row) && isset($row['EVENT_ID'])) {
+                            $eventIds[] = "'" . $helper->forSql((string) $row['EVENT_ID']) . "'";
+                        }
+                    }
+
+                    $deleted = count($eventIds);
+                    if ($deleted === 0) {
+                        break;
+                    }
+
+                    $idList = implode(', ', $eventIds);
+                    $connection->queryExecute(
+                        "DELETE FROM b_cmi_event_data WHERE EVENT_ID IN ({$idList})"
+                    );
+                    $connection->queryExecute(
+                        "DELETE FROM b_cmi_event WHERE EVENT_ID IN ({$idList})"
+                    );
+                } while ($deleted === self::BATCH_SIZE);
             } finally {
                 $connection->queryExecute("SELECT RELEASE_LOCK('{$lockName}')");
             }
