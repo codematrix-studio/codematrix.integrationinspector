@@ -34,6 +34,26 @@ final class EventRepositoryTest extends TestCase
         self::assertStringContainsString('LIMIT 0, 100', $sql);
     }
 
+    public function testArrayFilterValuesAreIgnoredWithoutWarnings(): void
+    {
+        $connection = new FakeConnection();
+        $repository = new EventRepository($connection);
+
+        $repository->findEvents([
+            'source_code' => ['unexpected'],
+            'status' => ['error'],
+            'direction' => ['incoming'],
+            'correlation_id' => ['trace'],
+            'date_from' => ['2026-11-24'],
+            'date_to' => ['2026-11-25'],
+        ]);
+
+        $sql = $connection->queries[0];
+
+        self::assertStringNotContainsString(' WHERE ', $sql);
+        self::assertStringContainsString('LIMIT 0, 50', $sql);
+    }
+
     public function testEventIdMustBeUuid(): void
     {
         $connection = new FakeConnection();
