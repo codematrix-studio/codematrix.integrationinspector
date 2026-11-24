@@ -48,7 +48,7 @@ final class Sanitizer
             return $payload;
         }
 
-        return substr($payload, 0, self::PAYLOAD_LIMIT);
+        return $this->truncateUtf8($payload, self::PAYLOAD_LIMIT);
     }
 
     public function sanitizeErrorMessage(string $message): string
