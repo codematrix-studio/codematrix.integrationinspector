@@ -51,6 +51,19 @@ final class SanitizerTest extends TestCase
         self::assertSame(212, $actual['_inspector_original_bytes']);
     }
 
+    public function testErrorMessageRedactsCredentialAssignments(): void
+    {
+        $sanitizer = new Sanitizer();
+
+        $actual = $sanitizer->sanitizeErrorMessage(
+            'Request failed: Authorization: BearerSecret password=secret-value'
+        );
+
+        self::assertStringNotContainsString('BearerSecret', $actual);
+        self::assertStringNotContainsString('secret-value', $actual);
+        self::assertStringContainsString('[REDACTED]', $actual);
+    }
+
     public function testPayloadRequiresBothGlobalAndCallOptIn(): void
     {
         $sanitizer = new Sanitizer();
