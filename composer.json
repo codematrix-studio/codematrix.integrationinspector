@@ -1,0 +1,25 @@
+{
+    "name": "codematrix-studio/integration-inspector",
+    "description": "Open-source integration diagnostics module for 1C-Bitrix.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "CodeMatrix\\\\IntegrationInspector\\\\": "local/modules/codematrix.integrationinspector/lib/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CodeMatrix\\\\IntegrationInspector\\\\Tests\\\\": "tests/Unit/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
