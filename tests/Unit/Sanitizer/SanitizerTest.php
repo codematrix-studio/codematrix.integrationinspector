@@ -56,10 +56,10 @@ final class SanitizerTest extends TestCase
         $sanitizer = new Sanitizer();
 
         $actual = $sanitizer->sanitizeErrorMessage(
-            'Request failed: Authorization: BearerSecret password=secret-value'
+            'Request failed: Authorization: Bearer bearer-token password=secret-value'
         );
 
-        self::assertStringNotContainsString('BearerSecret', $actual);
+        self::assertStringNotContainsString('bearer-token', $actual);
         self::assertStringNotContainsString('secret-value', $actual);
         self::assertStringContainsString('[REDACTED]', $actual);
     }
