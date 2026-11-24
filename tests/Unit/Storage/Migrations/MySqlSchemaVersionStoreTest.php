@@ -60,7 +60,19 @@ final class MySqlSchemaVersionStoreTest extends TestCase
         $store = new MySqlSchemaVersionStore($connection);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('stored CodeMatrix schema version is invalid');
+        $this->expectExceptionMessage('Stored CodeMatrix schema version is invalid');
+
+        $store->getVersion();
+    }
+
+    public function testFractionalStoredVersionIsRejected(): void
+    {
+        $connection = new FakeVersionConnection();
+        $connection->fetchRow = ['SCHEMA_VERSION' => '1.5'];
+        $store = new MySqlSchemaVersionStore($connection);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Stored CodeMatrix schema version is invalid');
 
         $store->getVersion();
     }
