@@ -109,7 +109,11 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
         }
 
         foreach ($expected as $table => $columns) {
-            if (($actual[$table] ?? []) !== $columns) {
+            $actualColumns = $actual[$table] ?? [];
+            ksort($actualColumns);
+            ksort($columns);
+
+            if ($actualColumns !== $columns) {
                 return false;
             }
         }
