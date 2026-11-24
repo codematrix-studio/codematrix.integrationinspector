@@ -11,10 +11,10 @@ use JsonException;
 use Throwable;
 
 /**
- * MySQL storage adapter built on the Bitrix D7 Connection API.
+ * Адаптер хранилища MySQL на основе API подключений Bitrix D7.
  *
- * The connection is supplied by the module factory. This class never starts,
- * commits, or rolls back transactions owned by the application.
+ * Соединение передаётся фабрикой модуля. Класс не начинает, не фиксирует
+ * и не откатывает транзакции, принадлежащие приложению.
  */
 final class MySqlEventStorage implements EventStorage
 {
@@ -76,7 +76,7 @@ final class MySqlEventStorage implements EventStorage
                     )"
                 );
             } catch (Throwable) {
-                // Keep the primary event even if optional diagnostic data cannot be stored.
+                // Сохраняем основное событие, даже если дополнительные данные диагностики записать не удалось.
             }
         }
 
@@ -126,7 +126,7 @@ final class MySqlEventStorage implements EventStorage
                         RESPONSE_PAYLOAD = VALUES(RESPONSE_PAYLOAD)"
                 );
             } catch (Throwable) {
-                // Final event status is more important than optional response details.
+                // Итоговый статус события важнее дополнительных сведений об ответе.
             }
         }
 
