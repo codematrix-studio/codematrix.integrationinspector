@@ -125,6 +125,7 @@ class codematrix_integrationinspector extends CModule
             unlink($target);
         }
     }
+
     private function removeThemeAssets(): void
     {
         // Удаляем только файлы иконок этого модуля, не затрагивая общие темы Bitrix.
@@ -151,5 +152,4 @@ class codematrix_integrationinspector extends CModule
             rmdir($iconsDirectory);
         }
     }
-
 }
