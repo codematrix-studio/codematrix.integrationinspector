@@ -127,13 +127,13 @@ class codematrix_integrationinspector extends CModule
             $isOwned = is_string($existing) && $this->isOwnedAdminEntryPoint($existing, $expected);
 
             if (!$isOwned) {
-                throw new \\RuntimeException(
+                throw new \RuntimeException(
                     'Файл /bitrix/admin/cmi_integrationinspector_events.php уже существует и не принадлежит модулю.'
                 );
             }
 
             // Актуальный wrapper уже установлен: оставляем его без изменений.
-            if ($this->normalizeLineEndings($existing) === $this->normalizeLineEndings($expected)) {
+            if (str_replace(["\r\n", "\r"], "\n", $existing) === str_replace(["\r\n", "\r"], "\n", $expected)) {
                 return;
             }
         } else {
@@ -142,7 +142,7 @@ class codematrix_integrationinspector extends CModule
 
         // Legacy wrapper обновляется; новый файл создаётся только при его отсутствии.
         if (!copy($source, $target)) {
-            throw new \\RuntimeException('Не удалось установить административную страницу модуля.');
+            throw new \RuntimeException('Не удалось установить административную страницу модуля.');
         }
     }
 
@@ -152,8 +152,17 @@ class codematrix_integrationinspector extends CModule
             return;
         }
 
-        $source = dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php';
         $target = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php';
+
+        if ($onlyIfCreatedDuringInstall && $this->adminEntryPointCreatedDuringInstall) {
+            if (is_file($target)) {
+                unlink($target);
+            }
+
+            return;
+        }
+
+        $source = dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php';
 
         if (!is_file($target) || !is_file($source)) {
             return;
@@ -271,6 +280,11 @@ PHP;
             }
 
             if (!is_file($source) || !is_file($target)) {
+                continue;
+            }
+
+            if ($onlyCreatedDuringInstall) {
+                unlink($target);
                 continue;
             }
 
