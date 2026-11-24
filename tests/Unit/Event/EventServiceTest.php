@@ -65,12 +65,36 @@ final class EventServiceTest extends TestCase
         );
         self::assertStringNotContainsString('hidden-token', $storage->finalized['result']['error_message']);
     }
+
+    public function testDisabledServiceReturnsNoOpHandleWithoutCallingStorage(): void
+    {
+        $storage = new InMemoryEventStorage();
+        $service = new EventService($storage, new Sanitizer(), new EventIdGenerator(), false);
+
+        $handle = $service->begin(new EventInput('1c', 'order.export', EventDirection::OUTGOING));
+
+        self::assertSame(RecordingStatus::DISABLED, $handle->getRecordingStatus());
+        self::assertNull($storage->created);
+    }
+
+    public function testStorageFailureDoesNotEscapeIntoBusinessCode(): void
+    {
+        $storage = new InMemoryEventStorage();
+        $storage->failCreate = true;
+        $service = new EventService($storage, new Sanitizer(), new EventIdGenerator());
+
+        $handle = $service->begin(new EventInput('1c', 'order.export', EventDirection::OUTGOING));
+
+        self::assertSame(RecordingStatus::STORAGE_UNAVAILABLE, $handle->getRecordingStatus());
+        self::assertSame(FinalizeResult::NOT_RECORDED, $handle->succeed());
+    }
 }
 
 final class InMemoryEventStorage implements EventStorage
 {
     public ?array $created = null;
     public ?array $finalized = null;
+    public bool $failCreate = false;
 
     public function createEvent(
         string $eventId,
@@ -85,6 +109,10 @@ final class InMemoryEventStorage implements EventStorage
         ?DateTimeImmutable $occurredAt,
         DateTimeImmutable $startedAt
     ): bool {
+        if ($this->failCreate) {
+            throw new RuntimeException('Storage unavailable');
+        }
+
         $this->created = compact(
             'eventId',
             'sourceCode',
