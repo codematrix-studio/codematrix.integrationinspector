@@ -29,15 +29,26 @@ class codematrix_integrationinspector extends CModule
         global $APPLICATION;
 
         try {
-            require_once dirname(__DIR__) . '/include.php';
+            // During installation the module is not registered yet, so Bitrix
+            // may resolve its module-relative autoload paths under /bitrix/modules.
+            // Load the installer from this local module directory explicitly.
+            require_once dirname(__DIR__) . '/lib/Storage/SchemaInstaller.php';
 
             $installer = new SchemaInstaller(Application::getConnection());
             $installer->install();
 
             RegisterModule($this->MODULE_ID);
 
+            // Register the remaining module classes only after the module path
+            // is known to Bitrix.
+            require_once dirname(__DIR__) . '/include.php';
+
             return true;
         } catch (Throwable $exception) {
+            if (\Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID)) {
+                UnRegisterModule($this->MODULE_ID);
+            }
+
             $APPLICATION->ThrowException(
                 'Не удалось установить CodeMatrix Integration Inspector: ' . $exception->getMessage()
             );
