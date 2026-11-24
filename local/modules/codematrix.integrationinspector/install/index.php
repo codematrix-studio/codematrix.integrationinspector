@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 use Bitrix\Main\Application;
 use CodeMatrix\IntegrationInspector\Storage\SchemaInstaller;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\InitialSchemaMigration;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MigrationRunner;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MySqlMigrationLock;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MySqlSchemaInspector;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MySqlSchemaVersionStore;
 
 class codematrix_integrationinspector extends CModule
 {
@@ -30,12 +35,36 @@ class codematrix_integrationinspector extends CModule
 
         try {
             // Во время установки модуль ещё не зарегистрирован, поэтому Bitrix
-            // может искать его классы относительно каталога /bitrix/modules.
-            // Подключаем установщик напрямую из каталога local/modules.
-            require_once dirname(__DIR__) . '/lib/Storage/SchemaInstaller.php';
+            // может искать классы относительно /bitrix/modules. Подключаем
+            // миграционные классы напрямую из local/modules.
+            $moduleLib = dirname(__DIR__) . '/lib/Storage/';
+            foreach ([
+                'SchemaInstaller.php',
+                'Migrations/SchemaMigration.php',
+                'Migrations/SchemaVersionStore.php',
+                'Migrations/MigrationLock.php',
+                'Migrations/InitialSchemaVerifier.php',
+                'Migrations/MySqlSchemaVersionStore.php',
+                'Migrations/MySqlMigrationLock.php',
+                'Migrations/MySqlSchemaInspector.php',
+                'Migrations/InitialSchemaMigration.php',
+                'Migrations/MigrationRunner.php',
+            ] as $classFile) {
+                require_once $moduleLib . $classFile;
+            }
 
-            $installer = new SchemaInstaller(Application::getConnection());
-            $installer->install();
+            $connection = Application::getConnection();
+            $runner = new MigrationRunner(
+                new MySqlSchemaVersionStore($connection),
+                [
+                    new InitialSchemaMigration(
+                        new SchemaInstaller($connection),
+                        new MySqlSchemaInspector($connection)
+                    ),
+                ],
+                new MySqlMigrationLock($connection)
+            );
+            $runner->run();
 
             RegisterModule($this->MODULE_ID);
 
