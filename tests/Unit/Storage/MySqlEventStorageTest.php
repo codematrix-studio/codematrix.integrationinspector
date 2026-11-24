@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace CodeMatrix\\IntegrationInspector\\Tests\\Storage;
+namespace CodeMatrix\IntegrationInspector\Tests\Storage;
 
-use CodeMatrix\\IntegrationInspector\\Api\\FinalizeResult;
-use CodeMatrix\\IntegrationInspector\\Storage\\MySqlEventStorage;
+use CodeMatrix\IntegrationInspector\Api\FinalizeResult;
+use CodeMatrix\IntegrationInspector\Storage\MySqlEventStorage;
 use DateTimeImmutable;
-use PHPUnit\\Framework\\TestCase;
+use PHPUnit\Framework\TestCase;
 
 final class MySqlEventStorageTest extends TestCase
 {
@@ -31,7 +31,7 @@ final class MySqlEventStorageTest extends TestCase
         ));
 
         self::assertCount(2, $connection->queries);
-        self::assertStringContainsString("order\\'s.export", $connection->queries[0]);
+        self::assertStringContainsString("order\'s.export", $connection->queries[0]);
         self::assertStringContainsString("INSERT INTO b_cmi_event_data", $connection->queries[1]);
         self::assertStringContainsString('"method":"POST"', $connection->queries[1]);
         self::assertStringContainsString('"scope":"catalog"', $connection->queries[1]);
@@ -124,6 +124,6 @@ final class FakeSqlHelper
 {
     public function forSql(string $value): string
     {
-        return str_replace("'", "\\'", $value);
+        return str_replace("'", "\'", $value);
     }
 }
