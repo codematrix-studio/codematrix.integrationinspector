@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Bitrix\\Main\\Application;
-use CodeMatrix\\IntegrationInspector\\Storage\\SchemaInstaller;
+use Bitrix\Main\Application;
+use CodeMatrix\IntegrationInspector\Storage\SchemaInstaller;
 
 class codematrix_integrationinspector extends CModule
 {
