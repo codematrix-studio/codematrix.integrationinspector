@@ -17,12 +17,16 @@ final class SanitizerTest extends TestCase
             'Authorization' => 'Bearer secret',
             'nested' => [
                 'api_key' => 'private',
+                'private_key' => 'private-key-value',
+                'credentials' => 'credential-value',
                 'safe' => 'visible',
             ],
         ], 16384);
 
         self::assertSame('[REDACTED]', $actual['Authorization']);
         self::assertSame('[REDACTED]', $actual['nested']['api_key']);
+        self::assertSame('[REDACTED]', $actual['nested']['private_key']);
+        self::assertSame('[REDACTED]', $actual['nested']['credentials']);
         self::assertSame('visible', $actual['nested']['safe']);
     }
 
