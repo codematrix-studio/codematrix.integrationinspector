@@ -132,15 +132,13 @@ class codematrix_integrationinspector extends CModule
                 );
             }
 
-            // Актуальный wrapper уже установлен: оставляем его без изменений.
-            if (str_replace(["\r\n", "\r"], "\n", $existing) === str_replace(["\r\n", "\r"], "\n", $expected)) {
-                return;
-            }
-        } else {
-            $this->adminEntryPointCreatedDuringInstall = true;
+            // Текущий и известный legacy-wrapper уже принадлежат модулю.
+            // Не переписываем их: повторная установка остаётся идемпотентной.
+            return;
         }
 
-        // Legacy wrapper обновляется; новый файл создаётся только при его отсутствии.
+        $this->adminEntryPointCreatedDuringInstall = true;
+
         if (!copy($source, $target)) {
             throw new \RuntimeException('Не удалось установить административную страницу модуля.');
         }
