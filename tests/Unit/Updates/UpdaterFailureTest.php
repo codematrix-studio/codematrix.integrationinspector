@@ -44,7 +44,7 @@ final class UpdaterFailureTest extends TestCase
     {
         $root = sys_get_temp_dir() . '/cmi-updater-' . bin2hex(random_bytes(8));
         $source = $root . '/updates/0.1.1/modules/codematrix.integrationinspector';
-        $updaterScript = dirname(__DIR__, 4) . '/updates/0.1.1/updater.php';
+        $updaterScript = dirname(__DIR__, 3) . '/updates/0.1.1/updater.php';
         $harness = $root . '/harness.php';
 
         if (!mkdir($source . '/lib/Storage/Migrations', 0777, true) && !is_dir($source)) {
