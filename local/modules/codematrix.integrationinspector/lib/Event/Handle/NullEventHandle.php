@@ -31,7 +31,7 @@ final readonly class NullEventHandle implements EventHandle
         return FinalizeResult::NOT_RECORDED;
     }
 
-    public function fail(\\Throwable $exception): FinalizeResult
+    public function fail(\Throwable $exception): FinalizeResult
     {
         return FinalizeResult::NOT_RECORDED;
     }
