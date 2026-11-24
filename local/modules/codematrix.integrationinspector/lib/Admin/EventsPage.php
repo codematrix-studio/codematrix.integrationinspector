@@ -109,7 +109,7 @@ try {
             throw new RuntimeException('Не удалось открыть поток CSV.');
         }
 
-        fwrite($output, "\\xEF\\xBB\\xBF");
+        fwrite($output, "\xEF\xBB\xBF");
         fputcsv($output, [
             'Event ID', 'Дата UTC', 'Источник', 'Операция', 'Направление',
             'Статус', 'Correlation ID', 'Длительность, мс', 'HTTP-статус',
