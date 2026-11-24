@@ -90,21 +90,28 @@ class codematrix_integrationinspector extends CModule
         $source = dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php';
         $target = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php';
 
+        $expected = file_get_contents($source);
+        if ($expected === false) {
+            throw new \\RuntimeException('Не удалось прочитать административную страницу модуля.');
+        }
+
         if (is_file($target)) {
             $existing = file_get_contents($target);
-            $expected = file_get_contents($source);
+            $isOwned = is_string($existing) && (
+                $existing === $expected
+                || str_contains($existing, 'CodeMatrix Integration Inspector: owned admin entry point.')
+            );
 
-            if ($existing !== $expected) {
-                throw new \RuntimeException(
+            if (!$isOwned) {
+                throw new \\RuntimeException(
                     'Файл /bitrix/admin/cmi_integrationinspector_events.php уже существует и не принадлежит модулю.'
                 );
             }
-
-            return;
         }
 
+        // Для принадлежащего модулю wrapper разрешено обновление его содержимого.
         if (!copy($source, $target)) {
-            throw new \RuntimeException('Не удалось установить административную страницу модуля.');
+            throw new \\RuntimeException('Не удалось установить административную страницу модуля.');
         }
     }
 
@@ -119,9 +126,13 @@ class codematrix_integrationinspector extends CModule
 
         $existing = file_get_contents($target);
         $expected = file_get_contents($source);
+        $isOwned = is_string($existing) && (
+            $existing === $expected
+            || str_contains($existing, 'CodeMatrix Integration Inspector: owned admin entry point.')
+        );
 
-        // Удаляем только точную копию собственного файла модуля.
-        if ($existing === $expected) {
+        // Удаляем только wrapper с маркером владения или legacy-копию исходника.
+        if ($isOwned) {
             unlink($target);
         }
     }
