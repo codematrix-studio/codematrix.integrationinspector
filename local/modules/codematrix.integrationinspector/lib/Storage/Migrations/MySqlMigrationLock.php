@@ -67,6 +67,11 @@ final class MySqlMigrationLock implements MigrationLock
             return;
         }
 
+        // Сбрасываем локальное состояние до обращения к БД: при потере
+        // соединения или чужом RELEASE_LOCK() следующий acquire обязан
+        // запросить блокировку заново, а не считать её уже полученной.
+        $this->acquired = false;
+
         $name = str_replace("'", "''", $this->lockName);
         $result = $this->connection->query(
             "SELECT RELEASE_LOCK('" . $name . "') AS LOCK_RESULT"
@@ -77,7 +82,6 @@ final class MySqlMigrationLock implements MigrationLock
             throw new RuntimeException('Unable to release MySQL schema migration lock.');
         }
 
-        $this->acquired = false;
     }
 
     private function fetchRow(mixed $result): array
