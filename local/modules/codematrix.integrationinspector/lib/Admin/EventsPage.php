@@ -30,6 +30,24 @@ function cmiIntegrationInspectorHtml($value): string
     return htmlspecialcharsbx((string) ($value ?? ''));
 }
 
+function cmiIntegrationInspectorGetString(string $name): string
+{
+    $value = $_GET[$name] ?? '';
+
+    return is_string($value) ? $value : '';
+}
+
+function cmiIntegrationInspectorGetPage(): int
+{
+    $value = cmiIntegrationInspectorGetString('page');
+
+    if ($value === '' || !ctype_digit($value)) {
+        return 1;
+    }
+
+    return max(1, min((int) $value, 1000000));
+}
+
 function cmiIntegrationInspectorDate(string $value): string
 {
     $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value);
@@ -43,12 +61,12 @@ function cmiIntegrationInspectorDate(string $value): string
 }
 
 $filters = [
-    'source_code' => trim((string) ($_GET['source_code'] ?? '')),
-    'status' => (string) ($_GET['status'] ?? ''),
-    'direction' => (string) ($_GET['direction'] ?? ''),
-    'correlation_id' => trim((string) ($_GET['correlation_id'] ?? '')),
-    'date_from' => cmiIntegrationInspectorDate((string) ($_GET['date_from'] ?? '')),
-    'date_to' => cmiIntegrationInspectorDate((string) ($_GET['date_to'] ?? '')),
+    'source_code' => trim(cmiIntegrationInspectorGetString('source_code')),
+    'status' => cmiIntegrationInspectorGetString('status'),
+    'direction' => cmiIntegrationInspectorGetString('direction'),
+    'correlation_id' => trim(cmiIntegrationInspectorGetString('correlation_id')),
+    'date_from' => cmiIntegrationInspectorDate(cmiIntegrationInspectorGetString('date_from')),
+    'date_to' => cmiIntegrationInspectorDate(cmiIntegrationInspectorGetString('date_to')),
 ];
 
 $filters['source_code'] = mb_substr($filters['source_code'], 0, 64);
@@ -60,9 +78,9 @@ if (!in_array($filters['direction'], ['', 'incoming', 'outgoing'], true)) {
     $filters['direction'] = '';
 }
 
-$pageNumber = max(1, (int) ($_GET['page'] ?? 1));
+$pageNumber = cmiIntegrationInspectorGetPage();
 $pageSize = 50;
-$eventId = (string) ($_GET['event_id'] ?? '');
+$eventId = mb_substr(cmiIntegrationInspectorGetString('event_id'), 0, 36);
 $connectionName = trim(Option::get($moduleId, 'connection_name', ''));
 
 try {
