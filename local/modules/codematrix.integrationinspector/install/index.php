@@ -38,7 +38,11 @@ class codematrix_integrationinspector extends CModule
     {
         global $APPLICATION;
 
+        // Повторная установка не должна снимать регистрацию уже установленного модуля.
+        $moduleWasInstalled = null;
+
         try {
+            $moduleWasInstalled = \Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID);
             // Во время установки модуль ещё не зарегистрирован, поэтому Bitrix
             // может искать классы относительно /bitrix/modules. Подключаем
             // миграционные классы напрямую из local/modules.
@@ -88,7 +92,10 @@ class codematrix_integrationinspector extends CModule
             $this->removeAdminEntryPoint(true);
             $this->removeThemeAssets(true);
 
-            if (\Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID)) {
+            if (
+                $moduleWasInstalled === false
+                && \Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID)
+            ) {
                 UnRegisterModule($this->MODULE_ID);
             }
 
