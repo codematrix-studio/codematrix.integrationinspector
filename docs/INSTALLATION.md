@@ -21,7 +21,7 @@ Bitrix обнаруживает модуль через install/index.php; кл�
 
 1. Проверить наличие обязательных файлов, минимальные требования PHP и доступность Main module API.
 2. Проверить, не установлен ли модуль.
-3. Подключить autoload модуля и создать таблицы/индексы через SchemaInstaller на default connection.
+3. Подключить миграционные классы и выполнить MigrationRunner на default connection: создать таблицу версии, получить MySQL advisory lock, затем создать начальную схему либо проверить baseline существующей схемы 0.1.0.
 4. Зарегистрировать модуль штатным способом только после успешного создания схемы.
 5. Создать начальные настройки и права доступа с безопасными значениями.
 6. Зарегистрировать агента очистки только после успешного создания схемы.
@@ -94,4 +94,4 @@ Bitrix обнаруживает модуль через install/index.php; кл�
 - CModule::DoUninstall: https://dev.1c-bitrix.ru/api_help/main/reference/cmodule/douninstall.php
 - CModule: https://dev.1c-bitrix.ru/api_help/main/reference/cmodule/index.php
 
-Первичная реализация находится в install/index.php, версия — install/version.php, DDL — lib/Storage/SchemaInstaller.php. Обычное удаление снимает регистрацию и сохраняет таблицы. Версионированные миграции, проверка уже существующей схемы, отдельное подтверждение полного удаления и повторное тестирование установщика на BitrixVM ещё не реализованы. CI проверяет синтаксис и unit-тесты, но не заменяет проверку Bitrix installer lifecycle.
+Первичная реализация находится в install/index.php, версия пакета — install/version.php, DDL — lib/Storage/SchemaInstaller.php. MigrationRunner, MySqlSchemaVersionStore, MySqlMigrationLock, MySqlSchemaInspector и InitialSchemaMigration подключены к DoInstall(). Новая установка создаёт схему версии 1; существующая схема 0.1.0 без записи версии принимается как baseline только после точного сравнения. Частичная схема не достраивается автоматически. Пакет обновления с updater.php, последующие миграции, отдельное подтверждение полного удаления и повторное тестирование установщика на BitrixVM ещё не реализованы. CI проверяет синтаксис и unit-тесты, но не заменяет проверку Bitrix installer lifecycle.
