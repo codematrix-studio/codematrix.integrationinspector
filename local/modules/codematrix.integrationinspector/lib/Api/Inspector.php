@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace CodeMatrix\\IntegrationInspector\\Api;
+namespace CodeMatrix\IntegrationInspector\Api;
 
-use Bitrix\\Main\\Application;
-use Bitrix\\Main\\Config\\Option;
-use CodeMatrix\\IntegrationInspector\\Event\\EventIdGenerator;
-use CodeMatrix\\IntegrationInspector\\Event\\EventService;
-use CodeMatrix\\IntegrationInspector\\Event\\Handle\\NullEventHandle;
-use CodeMatrix\\IntegrationInspector\\Sanitizer\\Sanitizer;
-use CodeMatrix\\IntegrationInspector\\Storage\\MySqlEventStorage;
+use Bitrix\Main\Application;
+use Bitrix\Main\Config\Option;
+use CodeMatrix\IntegrationInspector\Event\EventIdGenerator;
+use CodeMatrix\IntegrationInspector\Event\EventService;
+use CodeMatrix\IntegrationInspector\Event\Handle\NullEventHandle;
+use CodeMatrix\IntegrationInspector\Sanitizer\Sanitizer;
+use CodeMatrix\IntegrationInspector\Storage\MySqlEventStorage;
 use Throwable;
 
 /**
@@ -36,7 +36,7 @@ final class Inspector
      *     requestMetadata?: array,
      *     requestPayload?: ?string,
      *     context?: array,
-     *     occurredAt?: ?\\DateTimeImmutable
+     *     occurredAt?: ?\DateTimeImmutable
      * } $options
      */
     public static function begin(string $sourceCode, string $operation, array $options = []): EventHandle
@@ -56,7 +56,7 @@ final class Inspector
             );
 
             return self::service()->begin($input);
-        } catch (\\InvalidArgumentException) {
+        } catch (\InvalidArgumentException) {
             return new NullEventHandle(RecordingStatus::INVALID_INPUT);
         } catch (Throwable) {
             return new NullEventHandle(RecordingStatus::STORAGE_UNAVAILABLE);
