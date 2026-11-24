@@ -36,25 +36,21 @@
 
 ## 4. Публичный API
 
-Подробный проект контракта находится в [API.md](API.md). Предлагаемый стиль:
+Подробный проект контракта находится в [API.md](API.md). Предлагаемый стиль (проект API v0.2):
 
 ```php
-$start = Inspector::begin($input);
+$event = Inspector::begin($input);
 
-if ($start->isRecorded()) {
-    $event = $start->event();
-
-    try {
-        $result = $integration->execute();
-        $event->succeed($outcome);
-    } catch (\\Throwable $exception) {
-        $event->fail($exception);
-        throw $exception;
-    }
+try {
+    $result = $integration->execute();
+    $event->succeed($outcome);
+} catch (\\Throwable $exception) {
+    $event->fail($exception);
+    throw $exception;
 }
 ```
 
-Пример не является утверждённым API. До реализации необходимо согласовать открытые вопросы из API.md.
+`begin()` всегда возвращает безопасный handle, включая no-op вариант при отключённом модуле или недоступном хранилище. Бизнес-операция не должна зависеть от успешной записи диагностики. Контракт остаётся проектом до технической проверки.
 
 ## 5. Административные разделы
 
