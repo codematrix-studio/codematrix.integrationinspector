@@ -43,6 +43,11 @@ final class Inspector
     public static function begin(string $sourceCode, string $operation, array $options = []): EventHandle
     {
         try {
+            // Отключённая запись не должна даже пытаться подключаться к хранилищу.
+            if (Option::get(self::MODULE_ID, 'enabled', 'Y') !== 'Y') {
+                return new NullEventHandle(RecordingStatus::DISABLED);
+            }
+
             $direction = EventDirection::from($options['direction'] ?? EventDirection::OUTGOING->value);
             $input = new EventInput(
                 $sourceCode,
