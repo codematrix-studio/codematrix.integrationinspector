@@ -32,7 +32,7 @@ final class EventCleanup
                 : Application::getConnection($connectionName);
 
             if ($connection === null) {
-                throw new \\RuntimeException('Не удалось получить настроенное соединение хранилища.');
+                throw new \RuntimeException('Не удалось получить настроенное соединение хранилища.');
             }
 
             $helper = $connection->getSqlHelper();
