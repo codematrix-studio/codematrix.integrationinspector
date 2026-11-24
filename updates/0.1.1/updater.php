@@ -33,7 +33,7 @@ $moduleRelativePath = 'modules/' . $moduleId;
 $documentRoot = rtrim((string) $_SERVER['DOCUMENT_ROOT'], '/\\');
 $modulePath = $documentRoot . '/local/' . $moduleRelativePath;
 
-// CUpdater::CopyFiles() treats a missing source directory as a successful no-op.
+// CUpdater::CopyDirFiles() treats a missing source directory as a successful no-op.
 // Validate the extracted update source first so stale destination files cannot
 // make an incomplete update look successful.
 $updateModuleRelativePath = isset($updater->curModulePath) && is_string($updater->curModulePath)
