@@ -24,7 +24,7 @@ class codematrix_integrationinspector extends CModule
         $this->MODULE_VERSION_DATE = $arModuleVersion['VERSION_DATE'];
     }
 
-    public function DoInstall(): bool
+    public function DoInstall()
     {
         global $APPLICATION;
 
@@ -46,7 +46,7 @@ class codematrix_integrationinspector extends CModule
         }
     }
 
-    public function DoUninstall(): bool
+    public function DoUninstall()
     {
         UnRegisterModule($this->MODULE_ID);
 
