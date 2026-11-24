@@ -5,7 +5,8 @@
 ## [Unreleased]
 
 ### Added
-- Добавлены MySqlEventStorage на Bitrix D7 Connection и повторно запускаемый SchemaInstaller для b_cmi_event, b_cmi_event_data и b_cmi_source; транзакции вызывающего приложения не открываются и не завершаются. публичные DTO/enum API, EventHandle, no-op и рабочий handle, EventService, контракт EventStorage, генератор UUID v4, Sanitizer и регистрация классов через Bitrix Loader.
+- Добавлены MySqlEventStorage на Bitrix D7 Connection и повторно запускаемый SchemaInstaller для b_cmi_event, b_cmi_event_data и b_cmi_source; транзакции вызывающего приложения не открываются и не завершаются.
+- Добавлены `install/index.php` и `install/version.php`: первичная установка создаёт таблицы на default connection и регистрирует модуль после успешного DDL; обычное удаление снимает регистрацию, сохраняя историю. публичные DTO/enum API, EventHandle, no-op и рабочий handle, EventService, контракт EventStorage, генератор UUID v4, Sanitizer и регистрация классов через Bitrix Loader.
 - Добавлены unit-тесты EventService: проверка маскирования метаданных, выключенного по умолчанию payload, успешной и повторной финализации, маскирования токена, отключённой по умолчанию записи пути/строки исключения, отключённого сервиса и отказа хранилища.
 - Контракт EventStorage возвращает явный FinalizeResult, чтобы различать повторную финализацию, отсутствие записи и недоступность хранилища.
 - Путь и строка исключения выключены по умолчанию; сбор включается отдельной настройкой сервиса.
