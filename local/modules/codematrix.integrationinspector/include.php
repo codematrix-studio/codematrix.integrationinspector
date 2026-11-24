@@ -28,3 +28,22 @@ Loader::registerAutoLoadClasses(
         CodeMatrix\IntegrationInspector\Sanitizer\Sanitizer::class => 'lib/Sanitizer/Sanitizer.php',
     ]
 );
+
+
+// Подхватываем агент и на уже установленных сайтах после обновления модуля.
+$cleanupAgent = '\\CodeMatrix\\IntegrationInspector\\Storage\\EventCleanup::run();';
+$cleanupAgentResult = \CAgent::GetList([], [
+    'NAME' => $cleanupAgent,
+    'MODULE_ID' => 'codematrix.integrationinspector',
+])->Fetch();
+
+if (!$cleanupAgentResult) {
+    \CAgent::AddAgent(
+        $cleanupAgent,
+        'codematrix.integrationinspector',
+        'N',
+        86400,
+        '',
+        'Y'
+    );
+}
