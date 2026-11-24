@@ -36,6 +36,7 @@ CodeMatrix Integration Inspector — бесплатный открытый мо�
 - [Спецификация MVP](docs/MVP.md)
 - [Публичный API](docs/API.md)
 - [Стратегия транзакций](docs/TRANSACTION-STRATEGY.md)
+- [Протокол проверки транзакционной независимости](docs/TRANSACTION-SPIKE.md)
 - [Установка, обновление и удаление](docs/INSTALLATION.md)
 - [Ревизия API и технические рекомендации](docs/API-REVIEW.md)
 - [Модель хранения данных](docs/DATA-MODEL.md)
