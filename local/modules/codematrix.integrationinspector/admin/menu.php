@@ -17,4 +17,15 @@ return [
         'module_id' => 'codematrix.integrationinspector',
         'items_id' => 'menu_codematrix_integrationinspector',
     ],
+    [
+        'parent_menu' => 'global_menu_services',
+        'sort' => 451,
+        'text' => 'Настройки журнала интеграций',
+        'title' => 'Настройки CodeMatrix Integration Inspector',
+        'url' => 'settings.php?lang=' . LANGUAGE_ID . '&mid=codematrix.integrationinspector',
+        'more_url' => [
+            'settings.php?mid=codematrix.integrationinspector',
+        ],
+        'module_id' => 'codematrix.integrationinspector',
+    ],
 ];
