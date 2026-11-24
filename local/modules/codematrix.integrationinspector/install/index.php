@@ -58,6 +58,8 @@ class codematrix_integrationinspector extends CModule
 
             return true;
         } catch (Throwable $exception) {
+            $this->removeAdminEntryPoint();
+
             if (\Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID)) {
                 UnRegisterModule($this->MODULE_ID);
             }
