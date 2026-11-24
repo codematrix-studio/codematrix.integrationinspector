@@ -166,6 +166,8 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
             'nullable' => $nullable ? 'YES' : 'NO',
             'charset' => $charset,
             'collation' => $collation,
+            'default' => null,
+            'extra' => '',
         ];
         $plain = static fn (string $type, bool $nullable = false): array => [
             'type' => $type,
