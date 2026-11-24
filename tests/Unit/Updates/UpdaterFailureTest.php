@@ -40,7 +40,20 @@ final class UpdaterFailureTest extends TestCase
         self::assertNotEmpty($result['error_message']);
     }
 
-    private function runUpdater(bool $completeSource): array
+    public function testChecksumMismatchStopsBeforeDatabaseAccess(): void
+    {
+        $result = $this->runUpdater(completeSource: true, copySucceeds: true, corruptCopy: true);
+
+        self::assertSame(1, $result['copy_calls']);
+        self::assertFalse($result['database_accessed']);
+        self::assertNotEmpty($result['error_message']);
+    }
+
+    private function runUpdater(
+        bool $completeSource,
+        bool $copySucceeds = false,
+        bool $corruptCopy = false
+    ): array
     {
         $root = sys_get_temp_dir() . '/cmi-updater-' . bin2hex(random_bytes(8));
         $source = $root . '/updates/0.1.1/modules/codematrix.integrationinspector';
@@ -91,20 +104,54 @@ namespace {
         public int $copyCalls = 0;
         public string $curModulePath;
 
-        public function __construct(string $modulePath)
-        {
+        public function __construct(
+            string $modulePath,
+            private bool $copySucceeds,
+            private bool $corruptCopy
+        ) {
             $this->curModulePath = $modulePath;
         }
 
         public function CopyDirFiles(string $source, string $destination): bool
         {
             $this->copyCalls++;
-            return false;
+            if (!$this->copySucceeds) {
+                return false;
+            }
+
+            $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+            $sourcePath = $documentRoot . $source;
+            $destinationPath = $documentRoot . $destination;
+            mkdir($destinationPath, 0777, true);
+
+            $iterator = new \\RecursiveIteratorIterator(
+                new \\RecursiveDirectoryIterator($sourcePath, \\FilesystemIterator::SKIP_DOTS),
+                \\RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            foreach ($iterator as $item) {
+                $target = $destinationPath . '/' . $iterator->getSubPathName();
+                if ($item->isDir()) {
+                    mkdir($target, 0777, true);
+                } else {
+                    copy($item->getPathname(), $target);
+                }
+            }
+
+            if ($this->corruptCopy) {
+                file_put_contents($destinationPath . '/Migrations/MigrationRunner.php', 'corrupted');
+            }
+
+            return true;
         }
     }
 
     $_SERVER['DOCUMENT_ROOT'] = __DOC_ROOT__;
-    $updater = new FakeUpdater('/updates/0.1.1/modules/codematrix.integrationinspector');
+    $updater = new FakeUpdater(
+        '/updates/0.1.1/modules/codematrix.integrationinspector',
+        __COPY_SUCCEEDS__,
+        __CORRUPT_COPY__
+    );
     $errorMessage = '';
 
     include __UPDATER__;
@@ -117,8 +164,13 @@ namespace {
 }
 PHP;
             $harnessCode = str_replace(
-                ['__DOC_ROOT__', '__UPDATER__'],
-                [var_export($root, true), var_export($updaterScript, true)],
+                ['__DOC_ROOT__', '__UPDATER__', '__COPY_SUCCEEDS__', '__CORRUPT_COPY__'],
+                [
+                    var_export($root, true),
+                    var_export($updaterScript, true),
+                    var_export($copySucceeds, true),
+                    var_export($corruptCopy, true),
+                ],
                 $harnessCode
             );
             file_put_contents($harness, $harnessCode);
