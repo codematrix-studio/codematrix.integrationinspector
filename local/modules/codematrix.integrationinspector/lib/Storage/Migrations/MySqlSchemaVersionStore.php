@@ -56,7 +56,11 @@ final class MySqlSchemaVersionStore implements SchemaVersionStore
             return 0;
         }
 
-        if (!isset($row['SCHEMA_VERSION']) || !is_numeric($row['SCHEMA_VERSION'])) {
+        if (
+            !isset($row['SCHEMA_VERSION'])
+            || !preg_match('/^\\d+$/D', (string) $row['SCHEMA_VERSION'])
+            || (int) $row['SCHEMA_VERSION'] > 4294967295
+        ) {
             throw new RuntimeException('Stored CodeMatrix schema version is invalid.');
         }
 
@@ -70,8 +74,8 @@ final class MySqlSchemaVersionStore implements SchemaVersionStore
 
     public function setVersion(int $version): void
     {
-        if ($version < 0) {
-            throw new InvalidArgumentException('Schema version cannot be negative.');
+        if ($version < 0 || $version > 4294967295) {
+            throw new InvalidArgumentException('Schema version must fit into an unsigned MySQL INT.');
         }
 
         $this->connection->queryExecute(
