@@ -2,7 +2,7 @@
 
 - **Версия:** 0.1
 - **Дата:** 2026-11-24
-- **Статус:** начата реализация базового PHP-слоя: DTO/enum API, Sanitizer, UUID v4 и регистрация автозагрузки добавлены; Storage, фасад, установщик и административная часть не реализованы.
+- **Статус:** реализованы DTO/enum API, Sanitizer, UUID v4, EventService, рабочий/no-op handle и контракт EventStorage; SQL/ORM Storage, фасад, установщик и административная часть не реализованы.
 - **Назначение:** разложить MVP на небольшие компоненты с понятными границами и порядком реализации.
 
 ## 1. Принципы структуры
@@ -128,10 +128,10 @@ Agent/Cron  -> CleanupService -> StorageInterface
 1. Чистые PHP Value Objects и enum/status типы.
 2. Sanitizer и PayloadLimiter с unit-тестами.
 3. EventIdGenerator и тесты UUID v4.
-4. StorageInterface и ConnectionResolver.
-5. SchemaManager и проверка DDL на целевой БД.
-6. MysqlStorage: begin, finalize, read; тесты отказов и конкурентной финализации.
-7. RecordedEventHandle и NullEventHandle.
+4. Контракт EventStorage и чистый EventService с unit-тестами.
+5. Завершить DDL/ORM и connection spike на целевом Bitrix.
+6. Реализовать ConnectionResolver и SchemaManager.
+7. MysqlStorage: begin, finalize, read; тесты отказов и конкурентной финализации.
 8. Facade Inspector с best-effort границей.
 9. SourceService.
 10. CleanupService.
