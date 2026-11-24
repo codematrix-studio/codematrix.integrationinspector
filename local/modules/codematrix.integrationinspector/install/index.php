@@ -87,6 +87,15 @@ class codematrix_integrationinspector extends CModule
             // Не перезаписываем файлы темы, которые уже существуют и не совпадают с нашими.
             $this->installThemeAssets();
 
+            \\CAgent::AddAgent(
+                '\\\\CodeMatrix\\\\IntegrationInspector\\\\Storage\\\\EventCleanup::run();',
+                $this->MODULE_ID,
+                'N',
+                86400,
+                '',
+                'Y'
+            );
+
             return true;
         } catch (Throwable $exception) {
             $this->removeAdminEntryPoint(true);
@@ -112,6 +121,11 @@ class codematrix_integrationinspector extends CModule
         $this->removeAdminEntryPoint();
 
         $this->removeThemeAssets();
+
+        \\CAgent::RemoveAgent(
+            '\\\\CodeMatrix\\\\IntegrationInspector\\\\Storage\\\\EventCleanup::run();',
+            $this->MODULE_ID
+        );
 
         UnRegisterModule($this->MODULE_ID);
 
