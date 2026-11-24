@@ -38,6 +38,31 @@ final class MySqlMigrationLockTest extends TestCase
         self::assertCount(1, $connection->queries);
     }
 
+    public function testLostLockOwnershipDoesNotLeaveTheInstanceMarkedAsAcquired(): void
+    {
+        $connection = new FakeAdvisoryLockConnection([
+            ['LOCK_RESULT' => '1'],
+            ['LOCK_RESULT' => null],
+            ['LOCK_RESULT' => '1'],
+        ]);
+        $lock = new MySqlMigrationLock($connection);
+
+        self::assertTrue($lock->acquire());
+
+        try {
+            $lock->release();
+            self::fail('Expected release failure after lock ownership was lost.');
+        } catch (RuntimeException $exception) {
+            self::assertSame('Unable to release MySQL schema migration lock.', $exception->getMessage());
+        }
+
+        // Повторный acquire должен выполнить новый GET_LOCK(), а не вернуть
+        // локальный флаг от предыдущего соединения.
+        self::assertTrue($lock->acquire());
+        self::assertCount(3, $connection->queries);
+        self::assertStringContainsString('GET_LOCK(', $connection->queries[2]);
+    }
+
     public function testRejectsOverlongLockName(): void
     {
         $this->expectException(InvalidArgumentException::class);
