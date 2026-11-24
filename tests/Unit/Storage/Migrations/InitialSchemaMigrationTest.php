@@ -76,3 +76,36 @@ final class FakeInitialSchemaVerifier implements InitialSchemaVerifier
         return $this->matches;
     }
 }
+
+final class InitialSchemaVersionStore implements SchemaVersionStore
+{
+    public int $version = 0;
+    public array $writtenVersions = [];
+
+    public function ensureStorage(): void
+    {
+    }
+
+    public function getVersion(): int
+    {
+        return $this->version;
+    }
+
+    public function setVersion(int $version): void
+    {
+        $this->version = $version;
+        $this->writtenVersions[] = $version;
+    }
+}
+
+final class InitialSchemaMigrationLock implements MigrationLock
+{
+    public function acquire(): bool
+    {
+        return true;
+    }
+
+    public function release(): void
+    {
+    }
+}
