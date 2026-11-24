@@ -128,7 +128,8 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
     private function matchesIndexes(): bool
     {
         $rows = $this->fetchRows(
-            "SELECT TABLE_NAME, INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME
+            "SELECT TABLE_NAME, INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME,
+                    INDEX_TYPE, SUB_PART, COLLATION
              FROM INFORMATION_SCHEMA.STATISTICS
              WHERE TABLE_SCHEMA = DATABASE()
                AND TABLE_NAME IN ('b_cmi_event', 'b_cmi_event_data', 'b_cmi_source')
@@ -139,18 +140,31 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
         foreach ($rows as $row) {
             $key = $row['TABLE_NAME'] . ':' . $row['INDEX_NAME'];
             $actual[$key]['unique'] = (int) $row['NON_UNIQUE'] === 0;
+            $actual[$key]['type'] = strtoupper((string) $row['INDEX_TYPE']);
             $actual[$key]['columns'][] = $row['COLUMN_NAME'];
+            $actual[$key]['prefixes'][] = $row['SUB_PART'] === null ? null : (int) $row['SUB_PART'];
+            $actual[$key]['collations'][] = $row['COLLATION'] === null
+                ? null
+                : strtoupper((string) $row['COLLATION']);
         }
 
+        $index = static fn (bool $unique, array $columns): array => [
+            'unique' => $unique,
+            'type' => 'BTREE',
+            'columns' => $columns,
+            'prefixes' => array_fill(0, count($columns), null),
+            'collations' => array_fill(0, count($columns), 'A'),
+        ];
+
         $expected = [
-            'b_cmi_event:PRIMARY' => ['unique' => true, 'columns' => ['EVENT_ID']],
-            'b_cmi_event:IX_CMI_EVENT_DATE' => ['unique' => false, 'columns' => ['DATE_START']],
-            'b_cmi_event:IX_CMI_EVENT_SOURCE_DATE' => ['unique' => false, 'columns' => ['SOURCE_CODE', 'DATE_START']],
-            'b_cmi_event:IX_CMI_EVENT_STATUS_DATE' => ['unique' => false, 'columns' => ['STATUS', 'DATE_START']],
-            'b_cmi_event:IX_CMI_EVENT_DIRECTION_DATE' => ['unique' => false, 'columns' => ['DIRECTION', 'DATE_START']],
-            'b_cmi_event:IX_CMI_EVENT_CORRELATION' => ['unique' => false, 'columns' => ['CORRELATION_ID']],
-            'b_cmi_event_data:PRIMARY' => ['unique' => true, 'columns' => ['EVENT_ID']],
-            'b_cmi_source:PRIMARY' => ['unique' => true, 'columns' => ['CODE']],
+            'b_cmi_event:PRIMARY' => $index(true, ['EVENT_ID']),
+            'b_cmi_event:IX_CMI_EVENT_DATE' => $index(false, ['DATE_START']),
+            'b_cmi_event:IX_CMI_EVENT_SOURCE_DATE' => $index(false, ['SOURCE_CODE', 'DATE_START']),
+            'b_cmi_event:IX_CMI_EVENT_STATUS_DATE' => $index(false, ['STATUS', 'DATE_START']),
+            'b_cmi_event:IX_CMI_EVENT_DIRECTION_DATE' => $index(false, ['DIRECTION', 'DATE_START']),
+            'b_cmi_event:IX_CMI_EVENT_CORRELATION' => $index(false, ['CORRELATION_ID']),
+            'b_cmi_event_data:PRIMARY' => $index(true, ['EVENT_ID']),
+            'b_cmi_source:PRIMARY' => $index(true, ['CODE']),
         ];
 
         ksort($actual);
