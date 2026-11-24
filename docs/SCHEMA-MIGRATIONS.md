@@ -80,7 +80,7 @@ InitialSchemaMigration не запускает DDL, если обнаружен�
 - для штатного обновления 0.1.1 добавлен исходник корневого updater.php в updates/0.1.1/;
 - updater.php сначала копирует lib/Storage из пакета штатным $updater->CopyFiles(), поскольку новое API модуля недоступно до завершения updater;
 - затем он загружает MigrationRunner и зависимости из /local/modules/codematrix.integrationinspector/ и запускает baseline-проверку на default connection;
-- сборка архива описана в updates/README.md; в архиве updater.php должен лежать в корне, а lib/Storage/ — содержать актуальные файлы;
+- сборка архива описана в updates/README.md; в архиве updater.php и description.ru лежат в корне, install/version.php содержит версию обновления, а lib/Storage/ — актуальные файлы; updater.php должен учитывать, что Bitrix запускает его даже для неустановленных модулей;
 - обновление не запускается на пользовательском хите.
 
 Ограничения:
