@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CodeMatrix\IntegrationInspector\Storage;
 
+use CodeMatrix\\IntegrationInspector\\Api\\FinalizeResult;
 use DateTimeImmutable;
 
 interface EventStorage
@@ -28,5 +29,5 @@ interface EventStorage
         array $result,
         int $durationMs,
         DateTimeImmutable $finishedAt
-    ): bool;
+    ): FinalizeResult;
 }
