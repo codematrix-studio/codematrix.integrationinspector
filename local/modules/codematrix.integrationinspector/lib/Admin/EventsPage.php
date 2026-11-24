@@ -17,6 +17,8 @@ $APPLICATION->SetTitle('Журнал интеграций');
 if (!$USER->IsAdmin()) {
     $APPLICATION->AuthForm('Доступ к журналу интеграций разрешён только администраторам.');
 }
+    return;
+}
 
 if (!Loader::includeModule($moduleId)) {
     require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_admin_after.php';
@@ -27,7 +29,7 @@ if (!Loader::includeModule($moduleId)) {
 
 function cmiIntegrationInspectorHtml($value): string
 {
-    return htmlspecialcharsbx((string) ($value ?? ''));
+    return \\CodeMatrix\\IntegrationInspector\\Admin\\HtmlEscaper::escape($value);
 }
 
 function cmiIntegrationInspectorGetString(string $name): string
