@@ -1,8 +1,8 @@
-# Публичный API (проект спецификации)
+# Публичный API
 
 - **Версия:** 0.2
 - **Дата:** 2026-11-24
-- **Статус:** уточнённый проект контракта; требует технической проверки и утверждения до реализации.
+- **Статус:** первичная реализация фасада `Inspector::begin(string $sourceCode, string $operation, array $options = [])` добавлена; API ещё будет расширяться и проверяться на BitrixVM.
 - **Назначение:** определить стабильный внешний интерфейс до разработки ядра.
 
 ## 1. Принципы контракта
@@ -34,15 +34,16 @@ Namespace: `CodeMatrix\IntegrationInspector\Api`.
 
 ## 3. Фасад Inspector
 
-Предлагаемые методы:
+Реализованный на текущем этапе метод:
 
 ```php
-Inspector::begin(EventInput $input): EventHandle;
-
-Inspector::registerSource(SourceDefinition $source): RecordingStatus;
-
-Inspector::isEnabled(): bool;
+Inspector::begin(string $sourceCode, string $operation, array $options = []): EventHandle;
+Inspector::reset(): void;
 ```
+
+`begin()` принимает код источника и операции, а также массив опций. Направление по умолчанию — `outgoing`. Поддерживаемые опции: `direction`, `correlationId`, `parentEventId`, `requestMetadata`, `requestPayload`, `context`, `occurredAt`. Значение `direction` — `incoming`, `outgoing` или `internal`.
+
+`registerSource()` и `isEnabled()` пока не реализованы. Внутренний `EventService` использует `EventInput`.
 
 ### Ключевое правило begin()
 
@@ -60,7 +61,10 @@ Inspector::isEnabled(): bool;
 Пример:
 
 ```php
-$event = Inspector::begin($input);
+$event = Inspector::begin('1c', 'order.export', [
+    'direction' => 'outgoing',
+    'requestMetadata' => ['order_id' => 123],
+]);
 
 try {
     $result = $integration->execute();
