@@ -6,13 +6,13 @@
 
 ### Added
 - Добавлены MySqlEventStorage на Bitrix D7 Connection и повторно запускаемый SchemaInstaller для b_cmi_event, b_cmi_event_data и b_cmi_source; транзакции вызывающего приложения не открываются и не завершаются.
-- Добавлены `install/index.php` и `install/version.php`: первичная установка создаёт таблицы на default connection и регистрирует модуль после успешного DDL; обычное удаление снимает регистрацию, сохраняя историю. публичные DTO/enum API, EventHandle, no-op и рабочий handle, EventService, контракт EventStorage, генератор UUID v4, Sanitizer и регистрация классов через Bitrix Loader.
+- Добавлены `install/index.php` и `install/version.php`: первичная установка создаёт таблицы на default connection и регистрирует модуль после успешного DDL; обычное удаление снимает регистрацию, сохраняя историю. публичные DTO/enum API, фасад Inspector::begin(), EventHandle, no-op и рабочий handle, EventService, контракт EventStorage, генератор UUID v4, Sanitizer и регистрация классов через Bitrix Loader.
 - Добавлены unit-тесты EventService: проверка маскирования метаданных, выключенного по умолчанию payload, успешной и повторной финализации, маскирования токена, отключённой по умолчанию записи пути/строки исключения, отключённого сервиса и отказа хранилища.
 - Контракт EventStorage возвращает явный FinalizeResult, чтобы различать повторную финализацию, отсутствие записи и недоступность хранилища.
 - Путь и строка исключения выключены по умолчанию; сбор включается отдельной настройкой сервиса.
 - Для события документировано отдельное поле OCCURRED_AT, не подменяющее системное DATE_START.
 - Исправлено маскирование Authorization Bearer и объявление Throwable в NullEventHandle.
-- GitHub Actions: предыдущий прогон Composer validate, установка зависимостей и PHPUnit прошёл на PHP 8.2, 8.3 и 8.4; прогон с тестами SQL-адаптера и SchemaInstaller ожидает завершения.
+- GitHub Actions: Composer validate, установка зависимостей, PHP syntax lint и PHPUnit прошли на PHP 8.2, 8.3 и 8.4 для SQL-адаптера и SchemaInstaller.
 - Добавлены Composer/PHPUnit dev-конфигурация, первые unit-тесты для входных данных, UUID, NullEventHandle и Sanitizer, а также GitHub Actions workflow для PHP 8.2–8.4.
 
 
@@ -46,7 +46,7 @@
 - В ROADMAP добавлен отдельный этап ревизии API; рекомендации пока не считаются утверждённым публичным контрактом.
 
 ### Notes
-- Runtime-каркас и первый SQL-адаптер реализованы частично; фасад Inspector, интеграция установщика с жизненным циклом модуля, выборки, очистка и административный интерфейс ещё не реализованы.
+- Публичный фасад Inspector::begin() подключён; интеграционная проверка MySQL на BitrixVM, выборки журнала, retention cleanup и административный интерфейс ещё не реализованы.
 - Unit-тесты SQL-адаптера и SchemaInstaller, а также PHP syntax lint прошли в GitHub Actions на PHP 8.2, 8.3 и 8.4. SQL DDL всё ещё не проверен на реальной BitrixVM.
 - Документы API и архитектуры являются проектными предложениями и требуют согласования.
 - Первичная проверка платформенных требований не заменяет тестирование модуля на конкретных версиях ядра и СУБД.
