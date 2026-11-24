@@ -12,5 +12,5 @@ interface EventHandle
 
     public function succeed(?EventOutcome $outcome = null): FinalizeResult;
 
-    public function fail(\\Throwable $exception): FinalizeResult;
+    public function fail(\Throwable $exception): FinalizeResult;
 }
