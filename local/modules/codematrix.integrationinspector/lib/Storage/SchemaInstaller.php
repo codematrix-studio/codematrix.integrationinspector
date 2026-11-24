@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace CodeMatrix\IntegrationInspector\Storage;
 
 /**
- * Creates the initial MySQL schema. Safe to run repeatedly.
+ * Создаёт начальную структуру таблиц MySQL. Повторный запуск безопасен.
  */
 final class SchemaInstaller
 {
