@@ -90,7 +90,7 @@ final class Inspector
             : Application::getConnection($connectionName);
 
         if ($connection === null) {
-            throw new RuntimeException('Не удалось получить настроенное соединение Inspector.');
+            throw new \\RuntimeException('Не удалось получить настроенное соединение Inspector.');
         }
 
         self::$service = new EventService(
