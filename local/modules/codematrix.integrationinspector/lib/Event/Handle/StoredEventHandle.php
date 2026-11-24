@@ -84,7 +84,7 @@ final class StoredEventHandle implements EventHandle
         try {
             $durationMs = (int) ((hrtime(true) - $this->startedAtNanoseconds) / 1_000_000);
             $finishedAt = new DateTimeImmutable('now', new DateTimeZone('UTC'));
-            $stored = $this->storage->finalizeEvent(
+            $finalizeResult = $this->storage->finalizeEvent(
                 $this->eventId,
                 $status,
                 $result,
@@ -92,15 +92,11 @@ final class StoredEventHandle implements EventHandle
                 $finishedAt
             );
 
-            if (!$stored) {
+            if ($finalizeResult !== FinalizeResult::STORAGE_UNAVAILABLE) {
                 $this->finalized = true;
-
-                return FinalizeResult::ALREADY_FINALIZED;
             }
 
-            $this->finalized = true;
-
-            return FinalizeResult::RECORDED;
+            return $finalizeResult;
         } catch (Throwable) {
             return FinalizeResult::STORAGE_UNAVAILABLE;
         }
