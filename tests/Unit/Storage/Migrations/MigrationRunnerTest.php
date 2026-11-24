@@ -43,7 +43,8 @@ final class MigrationRunnerTest extends TestCase
     {
         $store = new InMemorySchemaVersionStore();
         $migration = new FakeSchemaMigration(1, fail: true);
-        $runner = new MigrationRunner($store, [$migration], new FakeMigrationLock());
+        $lock = new FakeMigrationLock();
+        $runner = new MigrationRunner($store, [$migration], $lock);
 
         try {
             $runner->run();
@@ -54,6 +55,7 @@ final class MigrationRunnerTest extends TestCase
 
         self::assertSame(0, $store->version);
         self::assertSame([], $store->writtenVersions);
+        self::assertTrue($lock->released);
     }
 
     public function testMigrationMustPassPhysicalSchemaVerificationBeforeVersionIsSaved(): void
