@@ -54,7 +54,7 @@ final class Sanitizer
     public function sanitizeErrorMessage(string $message): string
     {
         $message = preg_replace(
-            '/\\b(authorization|proxy-authorization|cookie|set-cookie|password|passwd|token|secret|api[_-]?key|access[_-]?key|client[_-]?secret)\\b(\\s*[:=]\\s*)([^\\s,;]+)/i',
+            '/\\b(authorization|proxy-authorization|cookie|set-cookie|password|passwd|token|secret|api[_-]?key|access[_-]?key|client[_-]?secret)\\b(\\s*[:=]\\s*)(?:Bearer\\s+)?([^\\s,;]+)/i',
             '$1$2[REDACTED]',
             $message
         ) ?? '';
