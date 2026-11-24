@@ -59,6 +59,7 @@ class codematrix_integrationinspector extends CModule
             return true;
         } catch (Throwable $exception) {
             $this->removeAdminEntryPoint();
+            $this->removeThemeAssets();
 
             if (\Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID)) {
                 UnRegisterModule($this->MODULE_ID);
@@ -76,29 +77,7 @@ class codematrix_integrationinspector extends CModule
     {
         $this->removeAdminEntryPoint();
 
-        // Удаляем только файлы иконок этого модуля, не затрагивая общие темы Bitrix.
-        $themeDirectory = $_SERVER['DOCUMENT_ROOT'] . '/local/themes/.default';
-        $themeFiles = [
-            $themeDirectory . '/codematrix.integrationinspector.css',
-            $themeDirectory . '/icons/codematrix.integrationinspector/menu.svg',
-            $themeDirectory . '/icons/codematrix.integrationinspector/page.svg',
-        ];
-
-        foreach ($themeFiles as $themeFile) {
-            if (is_file($themeFile)) {
-                unlink($themeFile);
-            }
-        }
-
-        $iconDirectory = $themeDirectory . '/icons/codematrix.integrationinspector';
-        if (is_dir($iconDirectory)) {
-            rmdir($iconDirectory);
-        }
-
-        $iconsDirectory = $themeDirectory . '/icons';
-        if (is_dir($iconsDirectory) && count(scandir($iconsDirectory)) === 2) {
-            rmdir($iconsDirectory);
-        }
+        $this->removeThemeAssets();
 
         UnRegisterModule($this->MODULE_ID);
 
@@ -146,4 +125,31 @@ class codematrix_integrationinspector extends CModule
             unlink($target);
         }
     }
+    private function removeThemeAssets(): void
+    {
+        // Удаляем только файлы иконок этого модуля, не затрагивая общие темы Bitrix.
+        $themeDirectory = $_SERVER['DOCUMENT_ROOT'] . '/local/themes/.default';
+        $themeFiles = [
+            $themeDirectory . '/codematrix.integrationinspector.css',
+            $themeDirectory . '/icons/codematrix.integrationinspector/menu.svg',
+            $themeDirectory . '/icons/codematrix.integrationinspector/page.svg',
+        ];
+
+        foreach ($themeFiles as $themeFile) {
+            if (is_file($themeFile)) {
+                unlink($themeFile);
+            }
+        }
+
+        $iconDirectory = $themeDirectory . '/icons/codematrix.integrationinspector';
+        if (is_dir($iconDirectory)) {
+            rmdir($iconDirectory);
+        }
+
+        $iconsDirectory = $themeDirectory . '/icons';
+        if (is_dir($iconsDirectory) && count(scandir($iconsDirectory)) === 2) {
+            rmdir($iconsDirectory);
+        }
+    }
+
 }
