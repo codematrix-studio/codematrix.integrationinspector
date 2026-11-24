@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace CodeMatrix\\IntegrationInspector\\Storage;
+namespace CodeMatrix\IntegrationInspector\Storage;
 
-use CodeMatrix\\IntegrationInspector\\Api\\FinalizeResult;
+use CodeMatrix\IntegrationInspector\Api\FinalizeResult;
 use DateTimeImmutable;
 use DateTimeZone;
 use JsonException;
@@ -25,7 +25,7 @@ final class MySqlEventStorage implements EventStorage
     {
         foreach (['queryExecute', 'getAffectedRowsCount', 'getSqlHelper'] as $method) {
             if (!method_exists($connection, $method)) {
-                throw new \\InvalidArgumentException('Connection must provide the Bitrix D7 SQL API.');
+                throw new \InvalidArgumentException('Connection must provide the Bitrix D7 SQL API.');
             }
         }
 
