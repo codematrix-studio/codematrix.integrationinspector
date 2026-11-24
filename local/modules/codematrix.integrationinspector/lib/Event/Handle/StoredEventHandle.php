@@ -39,32 +39,40 @@ final class StoredEventHandle implements EventHandle
 
     public function succeed(?EventOutcome $outcome = null): FinalizeResult
     {
-        $outcome ??= new EventOutcome();
+        try {
+            $outcome ??= new EventOutcome();
 
-        return $this->finalize('success', [
-            'http_status' => $outcome->httpStatus,
-            'result_code' => $outcome->resultCode,
-            'response_metadata' => $this->sanitizer->sanitizeMap(
-                $outcome->responseMetadata,
-                Sanitizer::RESPONSE_METADATA_LIMIT
-            ),
-            'response_payload' => $this->sanitizer->sanitizePayload(
-                $outcome->responsePayload,
-                $this->payloadsEnabled,
-                $outcome->responsePayload !== null
-            ),
-        ]);
+            return $this->finalize('success', [
+                'http_status' => $outcome->httpStatus,
+                'result_code' => $outcome->resultCode,
+                'response_metadata' => $this->sanitizer->sanitizeMap(
+                    $outcome->responseMetadata,
+                    Sanitizer::RESPONSE_METADATA_LIMIT
+                ),
+                'response_payload' => $this->sanitizer->sanitizePayload(
+                    $outcome->responsePayload,
+                    $this->payloadsEnabled,
+                    $outcome->responsePayload !== null
+                ),
+            ]);
+        } catch (Throwable) {
+            return FinalizeResult::STORAGE_UNAVAILABLE;
+        }
     }
 
     public function fail(Throwable $exception): FinalizeResult
     {
-        return $this->finalize('error', [
-            'exception_class' => get_class($exception),
-            'exception_code' => (string) $exception->getCode(),
-            'error_message' => $this->sanitizer->sanitizeErrorMessage($exception->getMessage()),
-            'error_file' => basename($exception->getFile()),
-            'error_line' => $exception->getLine(),
-        ]);
+        try {
+            return $this->finalize('error', [
+                'exception_class' => get_class($exception),
+                'exception_code' => (string) $exception->getCode(),
+                'error_message' => $this->sanitizer->sanitizeErrorMessage($exception->getMessage()),
+                'error_file' => basename($exception->getFile()),
+                'error_line' => $exception->getLine(),
+            ]);
+        } catch (Throwable) {
+            return FinalizeResult::STORAGE_UNAVAILABLE;
+        }
     }
 
     private function finalize(string $status, array $result): FinalizeResult
