@@ -5,8 +5,8 @@
 ## [Unreleased]
 
 ### Added
-- Начат runtime-каркас модуля: публичные DTO/enum API, интерфейс EventHandle, генератор UUID v4, Sanitizer и регистрация классов через Bitrix Loader.
-- Добавлены Composer/PHPUnit dev-конфигурация и первые unit-тесты для входных данных, UUID и санитарной обработки. Тесты пока не запускались.
+- Начат runtime-каркас модуля: публичные DTO/enum API, интерфейс EventHandle, NullEventHandle, генератор UUID v4, Sanitizer и регистрация классов через Bitrix Loader.
+- Добавлены Composer/PHPUnit dev-конфигурация, первые unit-тесты для входных данных, UUID, NullEventHandle и Sanitizer, а также GitHub Actions workflow для PHP 8.2–8.4. Тесты пока не запускались.
 
 
 ### Added
