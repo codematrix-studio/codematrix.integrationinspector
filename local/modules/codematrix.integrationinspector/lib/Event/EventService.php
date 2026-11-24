@@ -21,7 +21,8 @@ final readonly class EventService
         private Sanitizer $sanitizer,
         private EventIdGenerator $idGenerator,
         private bool $enabled = true,
-        private bool $payloadsEnabled = false
+        private bool $payloadsEnabled = false,
+        private bool $errorLocationEnabled = false
     ) {
     }
 
@@ -69,7 +70,8 @@ final readonly class EventService
                 hrtime(true),
                 $this->storage,
                 $this->sanitizer,
-                $this->payloadsEnabled
+                $this->payloadsEnabled,
+                $this->errorLocationEnabled
             );
         } catch (Throwable) {
             return new NullEventHandle(RecordingStatus::STORAGE_UNAVAILABLE);
