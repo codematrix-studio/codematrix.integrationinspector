@@ -18,7 +18,7 @@ final class MigrationRunnerTest extends TestCase
         $first = new FakeSchemaMigration(1);
         $second = new FakeSchemaMigration(2);
 
-        $runner = new MigrationRunner($store, [$second, $first]);
+        $runner = new MigrationRunner($store, [$second, $first], new FakeMigrationLock());
 
         self::assertSame(2, $runner->run());
         self::assertSame([1, 2], $store->writtenVersions);
@@ -32,7 +32,7 @@ final class MigrationRunnerTest extends TestCase
         $first = new FakeSchemaMigration(1);
         $second = new FakeSchemaMigration(2);
 
-        $runner = new MigrationRunner($store, [$first, $second]);
+        $runner = new MigrationRunner($store, [$first, $second], new FakeMigrationLock());
 
         self::assertSame(2, $runner->run());
         self::assertSame(0, $first->runs);
@@ -43,7 +43,7 @@ final class MigrationRunnerTest extends TestCase
     {
         $store = new InMemorySchemaVersionStore();
         $migration = new FakeSchemaMigration(1, fail: true);
-        $runner = new MigrationRunner($store, [$migration]);
+        $runner = new MigrationRunner($store, [$migration], new FakeMigrationLock());
 
         try {
             $runner->run();
@@ -78,7 +78,7 @@ final class MigrationRunnerTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('expected 1, got 2');
 
-        new MigrationRunner(new InMemorySchemaVersionStore(), [new FakeSchemaMigration(2)]);
+        new MigrationRunner(new InMemorySchemaVersionStore(), [new FakeSchemaMigration(2)], new FakeMigrationLock());
     }
 
     public function testUnknownNewerDatabaseVersionIsRejected(): void
@@ -88,15 +88,34 @@ final class MigrationRunnerTest extends TestCase
 
         (new MigrationRunner(
             new InMemorySchemaVersionStore(2),
-            [new FakeSchemaMigration(1)]
+            [new FakeSchemaMigration(1)],
+            new FakeMigrationLock()
         ))->run();
+    }
+
+    public function testRunnerStopsWhenAnotherProcessHoldsMigrationLock(): void
+    {
+        $store = new InMemorySchemaVersionStore();
+        $lock = new FakeMigrationLock(false);
+        $runner = new MigrationRunner($store, [new FakeSchemaMigration(1)], $lock);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Another schema migration process holds');
+
+        try {
+            $runner->run();
+        } finally {
+            self::assertFalse($store->storageEnsured);
+            self::assertSame(0, $store->version);
+            self::assertFalse($lock->released);
+        }
     }
 
     public function testEmptyMigrationSetDoesNotResetAnEmptySchemaVersion(): void
     {
         $store = new InMemorySchemaVersionStore();
 
-        self::assertSame(0, (new MigrationRunner($store, []))->run());
+        self::assertSame(0, (new MigrationRunner($store, [], new FakeMigrationLock()))->run());
         self::assertSame([], $store->writtenVersions);
     }
 }
@@ -162,5 +181,24 @@ final class FakeSchemaMigration implements SchemaMigration
     public function isApplied(): bool
     {
         return $this->verified;
+    }
+}
+
+final class FakeMigrationLock implements \CodeMatrix\IntegrationInspector\Storage\Migrations\MigrationLock
+{
+    public bool $released = false;
+
+    public function __construct(private bool $available = true)
+    {
+    }
+
+    public function acquire(): bool
+    {
+        return $this->available;
+    }
+
+    public function release(): void
+    {
+        $this->released = true;
     }
 }
