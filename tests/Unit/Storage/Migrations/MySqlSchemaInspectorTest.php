@@ -55,9 +55,9 @@ final class MySqlSchemaInspectorTest extends TestCase
     private static function schemaResultSets(): array
     {
         $tables = [
-            ['TABLE_NAME' => 'b_cmi_event', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci'],
-            ['TABLE_NAME' => 'b_cmi_event_data', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci'],
-            ['TABLE_NAME' => 'b_cmi_source', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci'],
+            ['TABLE_NAME' => 'b_cmi_event', 'TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci'],
+            ['TABLE_NAME' => 'b_cmi_event_data', 'TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci'],
+            ['TABLE_NAME' => 'b_cmi_source', 'TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci'],
         ];
 
         $columns = [];
@@ -76,6 +76,8 @@ final class MySqlSchemaInspectorTest extends TestCase
                 'IS_NULLABLE' => $nullable ? 'YES' : 'NO',
                 'CHARACTER_SET_NAME' => $charset,
                 'COLLATION_NAME' => $collation,
+                'COLUMN_DEFAULT' => null,
+                'EXTRA' => '',
             ];
         };
         $text = static function (string $table, string $name, string $type, bool $nullable = false) use ($add): void {
