@@ -20,6 +20,11 @@ class codematrix_integrationinspector extends CModule
     public $PARTNER_NAME = 'CodeMatrix STUDIO';
     public $PARTNER_URI = 'https://github.com/codematrix-studio';
 
+    private bool $adminEntryPointCreatedDuringInstall = false;
+
+    /** @var list<string> */
+    private array $themeAssetsCreatedDuringInstall = [];
+
     public function __construct()
     {
         $arModuleVersion = [];
@@ -80,8 +85,8 @@ class codematrix_integrationinspector extends CModule
 
             return true;
         } catch (Throwable $exception) {
-            $this->removeAdminEntryPoint();
-            $this->removeThemeAssets();
+            $this->removeAdminEntryPoint(true);
+            $this->removeThemeAssets(true);
 
             if (\Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID)) {
                 UnRegisterModule($this->MODULE_ID);
@@ -122,20 +127,31 @@ class codematrix_integrationinspector extends CModule
             $isOwned = is_string($existing) && $this->isOwnedAdminEntryPoint($existing, $expected);
 
             if (!$isOwned) {
-                throw new \RuntimeException(
+                throw new \\RuntimeException(
                     'Файл /bitrix/admin/cmi_integrationinspector_events.php уже существует и не принадлежит модулю.'
                 );
             }
+
+            // Актуальный wrapper уже установлен: оставляем его без изменений.
+            if ($this->normalizeLineEndings($existing) === $this->normalizeLineEndings($expected)) {
+                return;
+            }
+        } else {
+            $this->adminEntryPointCreatedDuringInstall = true;
         }
 
-        // Для принадлежащего модулю wrapper разрешено обновление его содержимого.
+        // Legacy wrapper обновляется; новый файл создаётся только при его отсутствии.
         if (!copy($source, $target)) {
-            throw new \RuntimeException('Не удалось установить административную страницу модуля.');
+            throw new \\RuntimeException('Не удалось установить административную страницу модуля.');
         }
     }
 
-    private function removeAdminEntryPoint(): void
+    private function removeAdminEntryPoint(bool $onlyIfCreatedDuringInstall = false): void
     {
+        if ($onlyIfCreatedDuringInstall && !$this->adminEntryPointCreatedDuringInstall) {
+            return;
+        }
+
         $source = dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php';
         $target = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php';
 
@@ -224,13 +240,15 @@ PHP;
                 throw new \RuntimeException('Не удалось создать каталог ресурсов темы.');
             }
 
+            $this->themeAssetsCreatedDuringInstall[] = $target;
+
             if (!copy($source, $target)) {
                 throw new \RuntimeException('Не удалось установить ресурс темы: ' . $relativeFile);
             }
         }
     }
 
-    private function removeThemeAssets(): void
+    private function removeThemeAssets(bool $onlyCreatedDuringInstall = false): void
     {
         // Удаляем только неизменённые файлы, совпадающие с поставляемыми модулем.
         $sourceDirectory = __DIR__ . '/themes/.default';
@@ -244,6 +262,13 @@ PHP;
         foreach ($relativeFiles as $relativeFile) {
             $source = $sourceDirectory . '/' . $relativeFile;
             $target = $targetDirectory . '/' . $relativeFile;
+
+            if (
+                $onlyCreatedDuringInstall
+                && !in_array($target, $this->themeAssetsCreatedDuringInstall, true)
+            ) {
+                continue;
+            }
 
             if (!is_file($source) || !is_file($target)) {
                 continue;
