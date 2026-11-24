@@ -183,8 +183,7 @@ class codematrix_integrationinspector extends CModule
     /**
      * Проверяет принадлежность административного wrapper модулю.
      *
-     * Поддерживаются текущая версия, legacy-версия до добавления маркера
-     * владения и файлы с маркером текущей версии.
+     * Поддерживаются только точная текущая версия и известная legacy-версия.
      */
     private function isOwnedAdminEntryPoint(string $existing, string $expected): bool
     {
