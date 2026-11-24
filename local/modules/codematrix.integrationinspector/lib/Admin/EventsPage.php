@@ -235,8 +235,21 @@ if (isset($errorMessage)) {
     echo '</tbody></table>';
 
     if ($pages > 1) {
+        $startPage = max(1, $pageNumber - 2);
+        $endPage = min($pages, $pageNumber + 2);
+        $visiblePages = array_unique(array_merge(
+            [1],
+            range($startPage, $endPage),
+            [$pages]
+        ));
+
         echo '<div class="adm-nav-pages"><span>Страницы: </span>';
-        for ($number = 1; $number <= $pages; $number++) {
+        $previousPage = 0;
+        foreach ($visiblePages as $number) {
+            if ($previousPage > 0 && $number > $previousPage + 1) {
+                echo '… ';
+            }
+
             $url = '/bitrix/admin/cmi_integrationinspector_events.php?' . http_build_query(
                 $baseParams + ['page' => $number]
             );
@@ -245,6 +258,7 @@ if (isset($errorMessage)) {
             } else {
                 echo '<a href="' . cmiIntegrationInspectorHtml($url) . '">' . $number . '</a> ';
             }
+            $previousPage = $number;
         }
         echo '</div>';
     }
