@@ -36,7 +36,7 @@ final class Inspector
      *     requestMetadata?: array,
      *     requestPayload?: ?string,
      *     context?: array,
-     *     occurredAt?: ?\\DateTimeImmutable
+     *     occurredAt?: ?\DateTimeImmutable
      * } $options
      */
     public static function begin(string $sourceCode, string $operation, array $options = []): EventHandle
@@ -56,7 +56,7 @@ final class Inspector
             );
 
             return self::service()->begin($input);
-        } catch (\\ValueError | \\InvalidArgumentException) {
+        } catch (\ValueError | \InvalidArgumentException) {
             return new NullEventHandle(RecordingStatus::INVALID_INPUT);
         } catch (Throwable) {
             return new NullEventHandle(RecordingStatus::STORAGE_UNAVAILABLE);
@@ -83,11 +83,15 @@ final class Inspector
         $connectionName = trim(Option::get(self::MODULE_ID, 'connection_name', ''));
 
         // Если явно задано именованное соединение, используем только его.
-        // При ошибке получения соединения не переключаемся на default:
-        // иначе запись Inspector может попасть в транзакцию приложения.
+        // При ошибке получения соединения не переключаемся на default,
+        // чтобы запись Inspector не попала в транзакцию приложения.
         $connection = $connectionName === ''
             ? Application::getConnection()
-            : Application::getInstance()->getConnectionPool()->getConnection($connectionName);
+            : Application::getConnection($connectionName);
+
+        if ($connection === null) {
+            throw new RuntimeException('Не удалось получить настроенное соединение Inspector.');
+        }
 
         self::$service = new EventService(
             new MySqlEventStorage($connection),
