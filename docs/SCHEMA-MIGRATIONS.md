@@ -32,7 +32,7 @@
 ## 5. Потоки запуска
 
 - Первичная установка: `install/index.php` подключает миграционные классы из каталога `local/modules` и запускает MigrationRunner на default connection до регистрации модуля.
-- Обновление 0.1.1: корневой `updater.php` сначала копирует `lib/Storage/` из пакета через `$updater->CopyFiles()`, затем запускает тот же MigrationRunner на default connection. После успеха Bitrix копирует остальные файлы пакета.
+- Обновление 0.1.1: корневой `updater.php` сначала копирует `lib/Storage/` из пакета через `$updater->CopyDirFiles()`, затем запускает тот же MigrationRunner на default connection. После успеха Bitrix копирует остальные файлы пакета.
 - Обычные запросы и открытие административного журнала миграции не запускают.
 
 ## 6. Сборка пакета
