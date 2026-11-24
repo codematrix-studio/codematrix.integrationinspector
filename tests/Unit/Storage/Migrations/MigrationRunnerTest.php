@@ -60,7 +60,7 @@ final class MigrationRunnerTest extends TestCase
     {
         $store = new InMemorySchemaVersionStore();
         $migration = new FakeSchemaMigration(1, verified: false);
-        $runner = new MigrationRunner($store, [$migration]);
+        $runner = new MigrationRunner($store, [$migration], new FakeMigrationLock());
 
         try {
             $runner->run();
