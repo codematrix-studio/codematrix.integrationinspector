@@ -6,6 +6,9 @@ namespace CodeMatrix\IntegrationInspector\Tests\Storage\Migrations;
 
 use CodeMatrix\IntegrationInspector\Storage\Migrations\InitialSchemaMigration;
 use CodeMatrix\IntegrationInspector\Storage\Migrations\InitialSchemaVerifier;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MigrationLock;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\MigrationRunner;
+use CodeMatrix\IntegrationInspector\Storage\Migrations\SchemaVersionStore;
 use CodeMatrix\IntegrationInspector\Storage\SchemaInstaller;
 use PHPUnit\Framework\TestCase;
 
@@ -45,6 +48,43 @@ final class InitialSchemaMigrationTest extends TestCase
 
         self::assertSame([], $connection->queries);
         self::assertFalse($migration->isApplied());
+    }
+
+    public function testRunnerRecordsMatchingExistingSchemaAsBaselineWithoutDdl(): void
+    {
+        $connection = new FakeInitialSchemaConnection();
+        $verifier = new FakeInitialSchemaVerifier(true, true);
+        $store = new InitialSchemaVersionStore();
+        $migration = new InitialSchemaMigration(new SchemaInstaller($connection), $verifier);
+        $runner = new MigrationRunner($store, [$migration], new InitialSchemaMigrationLock());
+
+        self::assertSame(1, $runner->run());
+        self::assertSame([], $connection->queries);
+        self::assertSame(1, $store->version);
+        self::assertSame([1], $store->writtenVersions);
+    }
+
+    public function testRunnerDoesNotRecordVersionForPartialExistingSchema(): void
+    {
+        $connection = new FakeInitialSchemaConnection();
+        $verifier = new FakeInitialSchemaVerifier(true, false);
+        $store = new InitialSchemaVersionStore();
+        $migration = new InitialSchemaMigration(new SchemaInstaller($connection), $verifier);
+        $runner = new MigrationRunner($store, [$migration], new InitialSchemaMigrationLock());
+
+        try {
+            $runner->run();
+            self::fail('Expected partial schema to be rejected.');
+        } catch (\RuntimeException $exception) {
+            self::assertStringContainsString(
+                'did not produce its expected schema',
+                $exception->getPrevious()?->getMessage()
+            );
+        }
+
+        self::assertSame([], $connection->queries);
+        self::assertSame(0, $store->version);
+        self::assertSame([], $store->writtenVersions);
     }
 }
 
