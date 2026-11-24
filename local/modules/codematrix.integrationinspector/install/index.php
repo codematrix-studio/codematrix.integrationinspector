@@ -44,7 +44,7 @@ class codematrix_integrationinspector extends CModule
             require_once dirname(__DIR__) . '/include.php';
 
             // Копируем только адресный файл входа в административную часть Bitrix.
-            if (!CopyDirFiles(dirname(__DIR__) . '/admin', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin', true, false)) {
+            if (!copy(dirname(__DIR__) . '/admin/cmi_integrationinspector_events.php', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php')) {
                 throw new \RuntimeException('Не удалось установить административную страницу модуля.');
             }
 
@@ -64,7 +64,7 @@ class codematrix_integrationinspector extends CModule
 
     public function DoUninstall()
     {
-        DeleteDirFiles(dirname(__DIR__) . '/admin', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin');
+        DeleteFile($_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/cmi_integrationinspector_events.php');
         UnRegisterModule($this->MODULE_ID);
 
         // При обычном удалении модуля история диагностики сохраняется.
