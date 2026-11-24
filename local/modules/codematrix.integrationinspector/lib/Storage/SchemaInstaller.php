@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace CodeMatrix\\IntegrationInspector\\Storage;
+namespace CodeMatrix\IntegrationInspector\Storage;
 
 /**
  * Creates the initial MySQL schema. Safe to run repeatedly.
@@ -14,7 +14,7 @@ final class SchemaInstaller
     public function __construct(object $connection)
     {
         if (!method_exists($connection, 'queryExecute')) {
-            throw new \\InvalidArgumentException('Connection must provide queryExecute().');
+            throw new \InvalidArgumentException('Connection must provide queryExecute().');
         }
 
         $this->connection = $connection;
