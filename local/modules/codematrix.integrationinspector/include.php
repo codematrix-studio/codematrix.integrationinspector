@@ -18,6 +18,7 @@ Loader::registerAutoLoadClasses(
         CodeMatrix\IntegrationInspector\Event\EventService::class => 'lib/Event/EventService.php',
         CodeMatrix\IntegrationInspector\Event\Handle\StoredEventHandle::class => 'lib/Event/Handle/StoredEventHandle.php',
         CodeMatrix\IntegrationInspector\Storage\EventStorage::class => 'lib/Storage/EventStorage.php',
+        CodeMatrix\IntegrationInspector\Storage\MySqlEventStorage::class => 'lib/Storage/MySqlEventStorage.php',
         CodeMatrix\IntegrationInspector\Sanitizer\Sanitizer::class => 'lib/Sanitizer/Sanitizer.php',
     ]
 );
