@@ -1,0 +1,7 @@
+/vendor/
+/.phpunit.cache/
+/coverage/
+.env
+.env.*
+/local/php_interface/dbconn.php
+/local/php_interface/.settings.php
