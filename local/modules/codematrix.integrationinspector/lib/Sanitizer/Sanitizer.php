@@ -14,7 +14,7 @@ final class Sanitizer
     public const MAX_DEPTH = 8;
 
     private const SENSITIVE_KEY_PATTERN =
-        '/(?:authorization|proxy-authorization|cookie|set-cookie|password|passwd|token|secret|api[_-]?key|access[_-]?key|client[_-]?secret)/i';
+        '/(?:authorization|proxy-authorization|cookie|set-cookie|password|passwd|token|secret|api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|signing[_-]?key|encryption[_-]?key|credentials?|session[_-]?id)/i';
 
     public function sanitizeMap(array $data, int $maxBytes): array
     {
@@ -54,7 +54,7 @@ final class Sanitizer
     public function sanitizeErrorMessage(string $message): string
     {
         $message = preg_replace(
-            '/\b(authorization|proxy-authorization|cookie|set-cookie|password|passwd|token|secret|api[_-]?key|access[_-]?key|client[_-]?secret)\b(\s*[:=]\s*)(?:Bearer\s+)?([^\s,;]+)/i',
+            '/\b(authorization|proxy-authorization|cookie|set-cookie|password|passwd|token|secret|api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|signing[_-]?key|encryption[_-]?key|credentials?|session[_-]?id)\b(\s*[:=]\s*)(?:Bearer\s+)?([^\s,;]+)/i',
             '$1$2[REDACTED]',
             $message
         ) ?? '';
