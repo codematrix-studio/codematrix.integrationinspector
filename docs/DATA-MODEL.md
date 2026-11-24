@@ -55,6 +55,7 @@
 | EVENT_ID | CHAR(36) ASCII, PK | ID события |
 | REQUEST_META | MEDIUMTEXT, NULL | JSON безопасных метаданных запроса |
 | RESPONSE_META | MEDIUMTEXT, NULL | JSON безопасных метаданных ответа |
+| CONTEXT | MEDIUMTEXT, NULL | JSON дополнительного технического контекста |
 | REQUEST_PAYLOAD | MEDIUMTEXT, NULL | Явно разрешённое текстовое тело запроса |
 | RESPONSE_PAYLOAD | MEDIUMTEXT, NULL | Явно разрешённое текстовое тело ответа |
 | ERROR_TRACE | MEDIUMTEXT, NULL | Stack trace, только если отдельно включён |
@@ -68,7 +69,6 @@
 | CODE | VARCHAR(64), PK | Стабильный код источника |
 | NAME | VARCHAR(255) | Отображаемое имя |
 | DESCRIPTION | VARCHAR(1000), NULL | Описание |
-| ACTIVE | CHAR(1) | Флаг активности для интерфейса/настроек |
 | DATE_CREATE | DATETIME | Дата создания в UTC |
 | DATE_UPDATE | DATETIME | Дата изменения в UTC |
 
@@ -87,7 +87,7 @@
 | IX_CMI_EVENT_DIRECTION_DATE | DIRECTION, DATE_START | Фильтр по направлению и периоду |
 | IX_CMI_EVENT_CORRELATION | CORRELATION_ID | Поиск связанной цепочки |
 
-Для `b_cmi_event_data` достаточно первичного ключа `EVENT_ID`. Для `b_cmi_source` первичный ключ `CODE` уже обеспечивает поиск по коду.
+Для `b_cmi_event_data` достаточно первичного ключа `EVENT_ID`. Для `b_cmi_source` первичный ключ `CODE` уже обеспечивает поиск по коду. Справочник содержит только описательные сведения и не отключает приём событий.
 
 Не индексировать длинные тексты, payload, сообщения исключений и stack trace. Индексы должны быть подтверждены EXPLAIN на тестовых объёмах.
 
