@@ -1,6 +1,7 @@
 /vendor/
 /.phpunit.cache/
 /coverage/
+/dist/
 .env
 .env.*
 /local/php_interface/dbconn.php
