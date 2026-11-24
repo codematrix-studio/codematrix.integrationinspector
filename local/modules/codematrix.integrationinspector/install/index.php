@@ -92,7 +92,7 @@ class codematrix_integrationinspector extends CModule
 
         $expected = file_get_contents($source);
         if ($expected === false) {
-            throw new \\RuntimeException('Не удалось прочитать административную страницу модуля.');
+            throw new \RuntimeException('Не удалось прочитать административную страницу модуля.');
         }
 
         if (is_file($target)) {
@@ -103,7 +103,7 @@ class codematrix_integrationinspector extends CModule
             );
 
             if (!$isOwned) {
-                throw new \\RuntimeException(
+                throw new \RuntimeException(
                     'Файл /bitrix/admin/cmi_integrationinspector_events.php уже существует и не принадлежит модулю.'
                 );
             }
@@ -111,7 +111,7 @@ class codematrix_integrationinspector extends CModule
 
         // Для принадлежащего модулю wrapper разрешено обновление его содержимого.
         if (!copy($source, $target)) {
-            throw new \\RuntimeException('Не удалось установить административную страницу модуля.');
+            throw new \RuntimeException('Не удалось установить административную страницу модуля.');
         }
     }
 
