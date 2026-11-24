@@ -50,10 +50,15 @@ final readonly class EventService
 
             if (!$this->storage->createEvent(
                 $eventId,
-                $input,
+                $input->sourceCode,
+                $input->operation,
+                $input->direction->value,
+                $input->correlationId,
+                $input->parentEventId,
                 $requestMetadata,
                 $context,
                 $requestPayload,
+                $input->occurredAt,
                 $startedAt
             )) {
                 return new NullEventHandle(RecordingStatus::STORAGE_UNAVAILABLE);
