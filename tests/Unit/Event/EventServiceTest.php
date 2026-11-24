@@ -136,9 +136,9 @@ final class InMemoryEventStorage implements EventStorage
         array $result,
         int $durationMs,
         DateTimeImmutable $finishedAt
-    ): bool {
+    ): FinalizeResult {
         $this->finalized = compact('eventId', 'status', 'result', 'durationMs', 'finishedAt');
 
-        return true;
+        return FinalizeResult::RECORDED;
     }
 }
