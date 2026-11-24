@@ -49,7 +49,7 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
     private function matchesTables(): bool
     {
         $rows = $this->fetchRows(
-            "SELECT TABLE_NAME, ENGINE, TABLE_COLLATION
+            "SELECT TABLE_NAME, TABLE_TYPE, ENGINE, TABLE_COLLATION
              FROM INFORMATION_SCHEMA.TABLES
              WHERE TABLE_SCHEMA = DATABASE()
                AND TABLE_NAME IN ('b_cmi_event', 'b_cmi_event_data', 'b_cmi_source')"
@@ -62,6 +62,7 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
         $actual = [];
         foreach ($rows as $row) {
             $actual[$row['TABLE_NAME']] = [
+                'type' => strtoupper((string) $row['TABLE_TYPE']),
                 'engine' => strtolower((string) $row['ENGINE']),
                 'collation' => strtolower((string) $row['TABLE_COLLATION']),
             ];
@@ -69,6 +70,7 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
 
         foreach (self::TABLES as $table) {
             if (($actual[$table] ?? null) !== [
+                'type' => 'BASE TABLE',
                 'engine' => 'innodb',
                 'collation' => 'utf8mb4_unicode_ci',
             ]) {
@@ -83,7 +85,7 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
     {
         $rows = $this->fetchRows(
             "SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE,
-                    CHARACTER_SET_NAME, COLLATION_NAME
+                    CHARACTER_SET_NAME, COLLATION_NAME, COLUMN_DEFAULT, EXTRA
              FROM INFORMATION_SCHEMA.COLUMNS
              WHERE TABLE_SCHEMA = DATABASE()
                AND TABLE_NAME IN ('b_cmi_event', 'b_cmi_event_data', 'b_cmi_source')"
@@ -105,6 +107,8 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
                 'collation' => $row['COLLATION_NAME'] === null
                     ? null
                     : strtolower((string) $row['COLLATION_NAME']),
+                'default' => $row['COLUMN_DEFAULT'],
+                'extra' => strtolower((string) $row['EXTRA']),
             ];
         }
 
@@ -168,6 +172,8 @@ final class MySqlSchemaInspector implements InitialSchemaVerifier
             'nullable' => $nullable ? 'YES' : 'NO',
             'charset' => null,
             'collation' => null,
+            'default' => null,
+            'extra' => '',
         ];
         $id = $text('char(36)', false, 'ascii', 'ascii_bin');
         $nullableId = $text('char(36)', true, 'ascii', 'ascii_bin');
