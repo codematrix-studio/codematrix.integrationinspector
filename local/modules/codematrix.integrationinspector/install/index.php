@@ -48,6 +48,16 @@ class codematrix_integrationinspector extends CModule
                 throw new \RuntimeException('Не удалось установить административную страницу модуля.');
             }
 
+            // Устанавливаем только собственные стили и изображения административного меню.
+            if (!CopyDirFiles(
+                __DIR__ . '/themes',
+                $_SERVER['DOCUMENT_ROOT'] . '/local/themes',
+                true,
+                true
+            )) {
+                throw new \RuntimeException('Не удалось установить иконки административного меню.');
+            }
+
             return true;
         } catch (Throwable $exception) {
             if (\Bitrix\Main\ModuleManager::isModuleInstalled($this->MODULE_ID)) {
@@ -68,6 +78,31 @@ class codematrix_integrationinspector extends CModule
         if (is_file($adminPage)) {
             unlink($adminPage);
         }
+
+        // Удаляем только файлы иконок этого модуля, не затрагивая общие темы Bitrix.
+        $themeDirectory = $_SERVER['DOCUMENT_ROOT'] . '/local/themes/.default';
+        $themeFiles = [
+            $themeDirectory . '/codematrix.integrationinspector.css',
+            $themeDirectory . '/icons/codematrix.integrationinspector/menu.svg',
+            $themeDirectory . '/icons/codematrix.integrationinspector/page.svg',
+        ];
+
+        foreach ($themeFiles as $themeFile) {
+            if (is_file($themeFile)) {
+                unlink($themeFile);
+            }
+        }
+
+        $iconDirectory = $themeDirectory . '/icons/codematrix.integrationinspector';
+        if (is_dir($iconDirectory)) {
+            rmdir($iconDirectory);
+        }
+
+        $iconsDirectory = $themeDirectory . '/icons';
+        if (is_dir($iconsDirectory) && count(scandir($iconsDirectory)) === 2) {
+            rmdir($iconsDirectory);
+        }
+
         UnRegisterModule($this->MODULE_ID);
 
         // При обычном удалении модуля история диагностики сохраняется.
