@@ -80,9 +80,17 @@ final class Inspector
         $enabled = Option::get(self::MODULE_ID, 'enabled', 'Y') === 'Y';
         $payloadsEnabled = Option::get(self::MODULE_ID, 'payloads_enabled', 'N') === 'Y';
         $errorLocationEnabled = Option::get(self::MODULE_ID, 'error_location_enabled', 'N') === 'Y';
+        $connectionName = trim(Option::get(self::MODULE_ID, 'connection_name', ''));
+
+        // An explicitly configured named connection is mandatory. If it cannot
+        // be obtained, begin() returns a no-op handle; never silently fall back
+        // to the application's default connection and join its transaction.
+        $connection = $connectionName === ''
+            ? Application::getConnection()
+            : Application::getConnectionPool()->getConnection($connectionName);
 
         self::$service = new EventService(
-            new MySqlEventStorage(Application::getConnection()),
+            new MySqlEventStorage($connection),
             new Sanitizer(),
             new EventIdGenerator(),
             $enabled,
