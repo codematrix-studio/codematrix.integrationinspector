@@ -26,7 +26,15 @@ final class EventCleanup
     public static function run(): string
     {
         try {
-            $connection = Application::getConnection();
+            $connectionName = trim(Option::get(self::MODULE_ID, 'connection_name', ''));
+            $connection = $connectionName === ''
+                ? Application::getConnection()
+                : Application::getConnection($connectionName);
+
+            if ($connection === null) {
+                throw new \\RuntimeException('Не удалось получить настроенное соединение хранилища.');
+            }
+
             $helper = $connection->getSqlHelper();
             $lockName = $helper->forSql(self::LOCK_NAME);
             $lock = $connection->query("SELECT GET_LOCK('{$lockName}', 0) AS LOCKED")->fetch();
