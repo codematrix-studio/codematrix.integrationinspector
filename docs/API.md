@@ -43,6 +43,8 @@ Inspector::reset(): void;
 
 `begin()` принимает код источника и операции, а также массив опций. Направление по умолчанию — `outgoing`. Поддерживаемые опции: `direction`, `correlationId`, `parentEventId`, `requestMetadata`, `requestPayload`, `context`, `occurredAt`. Значение `direction` — `incoming`, `outgoing` или `internal`.
 
+Имя соединения хранилища задаётся отдельно в настройке модуля `connection_name`, а не в опциях отдельного события. Пустое значение использует `Application::getConnection()`. Непустое значение разрешается через `Application::getConnectionPool()->getConnection($name)`. Если именованное соединение недоступно, возвращается no-op handle; автоматического fallback на default connection нет. После изменения настройки в текущем PHP-процессе вызови `Inspector::reset()`.
+
 `registerSource()` и `isEnabled()` пока не реализованы. Внутренний `EventService` использует `EventInput`.
 
 ### Ключевое правило begin()
