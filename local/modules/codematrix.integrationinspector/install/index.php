@@ -191,8 +191,7 @@ PHP;
         $existing = $normalize($existing);
 
         return $existing === $normalize($expected)
-            || $existing === $normalize($legacy)
-            || str_contains($existing, 'CodeMatrix Integration Inspector: owned admin entry point.');
+            || $existing === $normalize($legacy);
     }
 
     private function removeThemeAssets(): void
