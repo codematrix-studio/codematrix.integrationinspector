@@ -206,12 +206,12 @@ PHP;
             $content = file_get_contents($source);
 
             if ($content === false) {
-                throw new \\RuntimeException('Не удалось прочитать ресурс темы: ' . $relativeFile);
+                throw new \RuntimeException('Не удалось прочитать ресурс темы: ' . $relativeFile);
             }
 
             if (is_file($target)) {
                 if (file_get_contents($target) !== $content) {
-                    throw new \\RuntimeException(
+                    throw new \RuntimeException(
                         'Файл ресурса темы уже существует и отличается от файла модуля: ' . $relativeFile
                     );
                 }
@@ -221,11 +221,11 @@ PHP;
 
             $directory = dirname($target);
             if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
-                throw new \\RuntimeException('Не удалось создать каталог ресурсов темы.');
+                throw new \RuntimeException('Не удалось создать каталог ресурсов темы.');
             }
 
             if (!copy($source, $target)) {
-                throw new \\RuntimeException('Не удалось установить ресурс темы: ' . $relativeFile);
+                throw new \RuntimeException('Не удалось установить ресурс темы: ' . $relativeFile);
             }
         }
     }
