@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace CodeMatrix\IntegrationInspector\Storage;
 
-use CodeMatrix\IntegrationInspector\Api\EventInput;
 use DateTimeImmutable;
 
 interface EventStorage
 {
     public function createEvent(
         string $eventId,
-        EventInput $input,
+        string $sourceCode,
+        string $operation,
+        string $direction,
+        ?string $correlationId,
+        ?string $parentEventId,
         array $requestMetadata,
         array $context,
         ?string $requestPayload,
+        ?DateTimeImmutable $occurredAt,
         DateTimeImmutable $startedAt
     ): bool;
 
