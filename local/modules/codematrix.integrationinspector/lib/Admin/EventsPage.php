@@ -94,6 +94,76 @@ try {
     }
 
     $repository = new EventRepository($connection);
+
+    if (cmiIntegrationInspectorGetString('export') === 'csv') {
+        $exportLimit = 10000;
+        $exported = 0;
+        $filename = 'integration-events-' . gmdate('Y-m-d-His') . '.csv';
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('X-Content-Type-Options: nosniff');
+
+        $output = fopen('php://output', 'wb');
+        if ($output === false) {
+            throw new RuntimeException('Не удалось открыть поток CSV.');
+        }
+
+        fwrite($output, "\\xEF\\xBB\\xBF");
+        fputcsv($output, [
+            'Event ID', 'Дата UTC', 'Источник', 'Операция', 'Направление',
+            'Статус', 'Correlation ID', 'Длительность, мс', 'HTTP-статус',
+            'Код результата', 'Класс ошибки', 'Сообщение ошибки',
+        ], ';', '"', '');
+
+        while ($exported < $exportLimit) {
+            $batch = $repository->findEvents(
+                $filters,
+                min(100, $exportLimit - $exported),
+                $exported
+            );
+
+            if ($batch === []) {
+                break;
+            }
+
+            foreach ($batch as $row) {
+                $values = [
+                    $row['EVENT_ID'] ?? '',
+                    $row['DATE_START'] ?? '',
+                    $row['SOURCE_CODE'] ?? '',
+                    $row['OPERATION'] ?? '',
+                    $row['DIRECTION'] ?? '',
+                    $row['STATUS'] ?? '',
+                    $row['CORRELATION_ID'] ?? '',
+                    $row['DURATION_MS'] ?? '',
+                    $row['HTTP_STATUS'] ?? '',
+                    $row['RESULT_CODE'] ?? '',
+                    $row['ERROR_CLASS'] ?? '',
+                    $row['ERROR_MESSAGE'] ?? '',
+                ];
+
+                $values = array_map(static function ($value): string {
+                    $value = (string) $value;
+
+                    return preg_match('/^[\\s]*[=+\\-@]/u', $value) === 1
+                        ? "'" . $value
+                        : $value;
+                }, $values);
+
+                fputcsv($output, $values, ';', '"', '');
+                ++$exported;
+            }
+
+            if (count($batch) < 100) {
+                break;
+            }
+        }
+
+        fclose($output);
+        exit;
+    }
+
     $event = $eventId !== '' ? $repository->findEvent($eventId) : null;
     $total = $eventId === '' ? $repository->countEvents($filters) : 0;
     $pages = max(1, (int) ceil($total / $pageSize));
@@ -206,7 +276,11 @@ if (isset($errorMessage)) {
         . cmiIntegrationInspectorHtml(LANGUAGE_ID) . '">Сбросить</a></td>';
     echo '</tr></table></form>';
 
-    echo '<div class="adm-list-table-top"><b>Найдено событий: ' . (int) $total . '</b></div>';
+    $exportUrl = '/bitrix/admin/cmi_integrationinspector_events.php?' . http_build_query(
+        $baseParams + ['export' => 'csv']
+    );
+    echo '<div class="adm-list-table-top"><b>Найдено событий: ' . (int) $total . '</b> ';
+    echo '<a class="adm-btn" href="' . cmiIntegrationInspectorHtml($exportUrl) . '">Экспорт CSV (до 10 000)</a></div>';
     echo '<table class="adm-list-table" style="width:100%"><thead><tr>';
     foreach (['Дата (UTC)', 'Источник', 'Операция', 'Направление', 'Статус', 'HTTP', 'Длительность'] as $heading) {
         echo '<th class="adm-list-table-cell"><span class="adm-list-table-cell-inner">'
