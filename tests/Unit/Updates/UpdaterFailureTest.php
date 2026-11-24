@@ -124,9 +124,9 @@ namespace {
             $destinationPath = $documentRoot . $destination;
             mkdir($destinationPath, 0777, true);
 
-            $iterator = new \\RecursiveIteratorIterator(
-                new \\RecursiveDirectoryIterator($sourcePath, \\FilesystemIterator::SKIP_DOTS),
-                \\RecursiveIteratorIterator::SELF_FIRST
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($sourcePath, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST
             );
 
             foreach ($iterator as $item) {
