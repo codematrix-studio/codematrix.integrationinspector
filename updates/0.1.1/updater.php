@@ -24,7 +24,7 @@ if (!ModuleManager::isModuleInstalled($moduleId)) {
     return;
 }
 
-if (!isset($updater) || !is_object($updater) || !method_exists($updater, 'CopyFiles')) {
+if (!isset($updater) || !is_object($updater) || !method_exists($updater, 'CopyDirFiles')) {
     $errorMessage = 'Не удалось обновить CodeMatrix Integration Inspector: недоступен механизм копирования файлов Bitrix.';
     return;
 }
@@ -36,9 +36,10 @@ $modulePath = $documentRoot . '/local/' . $moduleRelativePath;
 // CUpdater::CopyFiles() treats a missing source directory as a successful no-op.
 // Validate the extracted update source first so stale destination files cannot
 // make an incomplete update look successful.
-$updateModulePath = isset($updater->curModulePath) && is_string($updater->curModulePath)
-    ? $documentRoot . '/' . ltrim(rtrim($updater->curModulePath, '/\\'), '/\\')
+$updateModuleRelativePath = isset($updater->curModulePath) && is_string($updater->curModulePath)
+    ? '/' . ltrim(rtrim($updater->curModulePath, '/\\'), '/\\')
     : '';
+$updateModulePath = $documentRoot . $updateModuleRelativePath;
 
 if (
     $documentRoot === ''
@@ -50,8 +51,13 @@ if (
 }
 
 try {
-    // New module API is unavailable until the update script copies these files.
-    if (!$updater->CopyFiles('lib/Storage', $moduleRelativePath . '/lib/Storage')) {
+    // CUpdater::CopyFiles() always resolves relative destinations under /bitrix.
+    // CopyDirFiles() accepts an absolute site-relative destination, so the
+    // migration classes are installed into this module's actual /local path.
+    if (!$updater->CopyDirFiles(
+        $updateModuleRelativePath . '/lib/Storage',
+        '/local/' . $moduleRelativePath . '/lib/Storage'
+    )) {
         throw new RuntimeException('Bitrix failed to copy the migration files.');
     }
 
