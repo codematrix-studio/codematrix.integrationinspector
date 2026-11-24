@@ -79,6 +79,56 @@ final class MySqlSchemaInspectorTest extends TestCase
         self::assertFalse($inspector->hasAnyModuleTables());
     }
 
+
+    public function testRejectsUnexpectedColumn(): void
+    {
+        $sets = self::schemaResultSets();
+        $sets[1][] = [
+            'TABLE_NAME' => 'b_cmi_event',
+            'COLUMN_NAME' => 'UNEXPECTED_COLUMN',
+            'COLUMN_TYPE' => 'varchar(32)',
+            'IS_NULLABLE' => 'YES',
+            'CHARACTER_SET_NAME' => 'utf8mb4',
+            'COLLATION_NAME' => 'utf8mb4_unicode_ci',
+            'COLUMN_DEFAULT' => null,
+            'EXTRA' => '',
+        ];
+
+        $inspector = new MySqlSchemaInspector(new FakeSchemaInspectorConnection($sets));
+
+        self::assertFalse($inspector->matchesInitialSchema());
+    }
+
+    public function testRejectsDifferentTableCollation(): void
+    {
+        $sets = self::schemaResultSets();
+        $sets[0][0]['TABLE_COLLATION'] = 'utf8mb4_general_ci';
+
+        $inspector = new MySqlSchemaInspector(new FakeSchemaInspectorConnection($sets));
+
+        self::assertFalse($inspector->matchesInitialSchema());
+    }
+
+    public function testRejectsColumnDefaultMismatch(): void
+    {
+        $sets = self::schemaResultSets();
+        $sets[1][0]['COLUMN_DEFAULT'] = 'unexpected';
+
+        $inspector = new MySqlSchemaInspector(new FakeSchemaInspectorConnection($sets));
+
+        self::assertFalse($inspector->matchesInitialSchema());
+    }
+
+    public function testRejectsWrongStorageEngine(): void
+    {
+        $sets = self::schemaResultSets();
+        $sets[0][1]['ENGINE'] = 'MyISAM';
+
+        $inspector = new MySqlSchemaInspector(new FakeSchemaInspectorConnection($sets));
+
+        self::assertFalse($inspector->matchesInitialSchema());
+    }
+
     private static function schemaResultSets(): array
     {
         $tables = [
