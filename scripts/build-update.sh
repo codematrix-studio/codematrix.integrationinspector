@@ -8,6 +8,7 @@ MODULE_DIR="$ROOT/local/modules/$MODULE_ID"
 UPDATE_DIR="$ROOT/updates/$VERSION"
 DIST_DIR="$ROOT/dist"
 STAGE_DIR="$(mktemp -d)"
+trap 'rm -rf "$STAGE_DIR"' EXIT
 PACKAGE_DIR="$STAGE_DIR/$VERSION"
 ARCHIVE="$DIST_DIR/$VERSION.zip"
 
@@ -38,14 +39,14 @@ cp -a "$MODULE_DIR/." "$PACKAGE_DIR/"
 cp "$UPDATE_DIR/updater.php" "$PACKAGE_DIR/updater.php"
 cp "$UPDATE_DIR/description.ru" "$PACKAGE_DIR/description.ru"
 
-# Normalize timestamps so repeated builds from the same commit are reproducible.
+# Normalize timestamps and archive entry order for repeatable builds.
 SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-1704067200}"
 find "$PACKAGE_DIR" -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +
 
 rm -f "$ARCHIVE"
 (
     cd "$PACKAGE_DIR"
-    zip -X -q -r "$ARCHIVE" .
+    find . -mindepth 1 -print | sed 's#^\./##' | LC_ALL=C sort | zip -X -q "$ARCHIVE" -@
 )
 
 unzip -tq "$ARCHIVE"
