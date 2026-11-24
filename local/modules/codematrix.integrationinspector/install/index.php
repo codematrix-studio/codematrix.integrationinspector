@@ -75,15 +75,8 @@ class codematrix_integrationinspector extends CModule
             // Не перезаписываем чужую административную страницу с тем же именем.
             $this->installAdminEntryPoint();
 
-            // Устанавливаем только собственные стили и изображения административного меню.
-            if (!CopyDirFiles(
-                __DIR__ . '/themes',
-                $_SERVER['DOCUMENT_ROOT'] . '/local/themes',
-                true,
-                true
-            )) {
-                throw new \RuntimeException('Не удалось установить иконки административного меню.');
-            }
+            // Не перезаписываем файлы темы, которые уже существуют и не совпадают с нашими.
+            $this->installThemeAssets();
 
             return true;
         } catch (Throwable $exception) {
@@ -194,28 +187,82 @@ PHP;
             || $existing === $normalize($legacy);
     }
 
-    private function removeThemeAssets(): void
+    /**
+     * Устанавливает ресурсы темы, не перезаписывая чужие или изменённые файлы.
+     */
+    private function installThemeAssets(): void
     {
-        // Удаляем только файлы иконок этого модуля, не затрагивая общие темы Bitrix.
-        $themeDirectory = $_SERVER['DOCUMENT_ROOT'] . '/local/themes/.default';
-        $themeFiles = [
-            $themeDirectory . '/codematrix.integrationinspector.css',
-            $themeDirectory . '/icons/codematrix.integrationinspector/menu.svg',
-            $themeDirectory . '/icons/codematrix.integrationinspector/page.svg',
+        $sourceDirectory = __DIR__ . '/themes/.default';
+        $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/local/themes/.default';
+        $relativeFiles = [
+            'codematrix.integrationinspector.css',
+            'icons/codematrix.integrationinspector/menu.svg',
+            'icons/codematrix.integrationinspector/page.svg',
         ];
 
-        foreach ($themeFiles as $themeFile) {
-            if (is_file($themeFile)) {
-                unlink($themeFile);
+        foreach ($relativeFiles as $relativeFile) {
+            $source = $sourceDirectory . '/' . $relativeFile;
+            $target = $targetDirectory . '/' . $relativeFile;
+            $content = file_get_contents($source);
+
+            if ($content === false) {
+                throw new \\RuntimeException('Не удалось прочитать ресурс темы: ' . $relativeFile);
+            }
+
+            if (is_file($target)) {
+                if (file_get_contents($target) !== $content) {
+                    throw new \\RuntimeException(
+                        'Файл ресурса темы уже существует и отличается от файла модуля: ' . $relativeFile
+                    );
+                }
+
+                continue;
+            }
+
+            $directory = dirname($target);
+            if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
+                throw new \\RuntimeException('Не удалось создать каталог ресурсов темы.');
+            }
+
+            if (!copy($source, $target)) {
+                throw new \\RuntimeException('Не удалось установить ресурс темы: ' . $relativeFile);
+            }
+        }
+    }
+
+    private function removeThemeAssets(): void
+    {
+        // Удаляем только неизменённые файлы, совпадающие с поставляемыми модулем.
+        $sourceDirectory = __DIR__ . '/themes/.default';
+        $targetDirectory = $_SERVER['DOCUMENT_ROOT'] . '/local/themes/.default';
+        $relativeFiles = [
+            'codematrix.integrationinspector.css',
+            'icons/codematrix.integrationinspector/menu.svg',
+            'icons/codematrix.integrationinspector/page.svg',
+        ];
+
+        foreach ($relativeFiles as $relativeFile) {
+            $source = $sourceDirectory . '/' . $relativeFile;
+            $target = $targetDirectory . '/' . $relativeFile;
+
+            if (!is_file($source) || !is_file($target)) {
+                continue;
+            }
+
+            $sourceContent = file_get_contents($source);
+            $targetContent = file_get_contents($target);
+
+            if (is_string($sourceContent) && $targetContent === $sourceContent) {
+                unlink($target);
             }
         }
 
-        $iconDirectory = $themeDirectory . '/icons/codematrix.integrationinspector';
+        $iconDirectory = $targetDirectory . '/icons/codematrix.integrationinspector';
         if (is_dir($iconDirectory)) {
             rmdir($iconDirectory);
         }
 
-        $iconsDirectory = $themeDirectory . '/icons';
+        $iconsDirectory = $targetDirectory . '/icons';
         if (is_dir($iconsDirectory) && count(scandir($iconsDirectory)) === 2) {
             rmdir($iconsDirectory);
         }
