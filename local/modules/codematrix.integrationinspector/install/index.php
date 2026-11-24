@@ -29,9 +29,9 @@ class codematrix_integrationinspector extends CModule
         global $APPLICATION;
 
         try {
-            // During installation the module is not registered yet, so Bitrix
-            // may resolve its module-relative autoload paths under /bitrix/modules.
-            // Load the installer from this local module directory explicitly.
+            // Во время установки модуль ещё не зарегистрирован, поэтому Bitrix
+            // может искать его классы относительно каталога /bitrix/modules.
+            // Подключаем установщик напрямую из каталога local/modules.
             require_once dirname(__DIR__) . '/lib/Storage/SchemaInstaller.php';
 
             $installer = new SchemaInstaller(Application::getConnection());
@@ -39,8 +39,8 @@ class codematrix_integrationinspector extends CModule
 
             RegisterModule($this->MODULE_ID);
 
-            // Register the remaining module classes only after the module path
-            // is known to Bitrix.
+            // Регистрируем остальные классы модуля только после того,
+            // как Bitrix получил корректный путь к модулю.
             require_once dirname(__DIR__) . '/include.php';
 
             return true;
@@ -61,7 +61,7 @@ class codematrix_integrationinspector extends CModule
     {
         UnRegisterModule($this->MODULE_ID);
 
-        // Diagnostic history is intentionally preserved on ordinary uninstall.
+        // При обычном удалении модуля история диагностики сохраняется.
         return true;
     }
 }
